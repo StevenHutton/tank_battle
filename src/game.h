@@ -61,11 +61,6 @@ Copy(size_t size, void *sourceInit, void *destInit)
     return destInit;
 }
 
-typedef void platform_work_queue_callback(void *Data);
-
-typedef struct platform_work_queue platform_work_queue;
-typedef void platform_add_work_entry(platform_work_queue *Queue, platform_work_queue_callback *Callback, void *Data);
-typedef void platform_complete_all_work(platform_work_queue *Queue);
 typedef void platform_add_quad_to_render_buffer(Quad quad, uint32 texture_handle);
 
 struct read_file_result
@@ -80,9 +75,9 @@ typedef struct
 {
 	platform_add_quad_to_render_buffer * AddQuadToRenderBuffer;
     
-    read_entire_file *ReadEntireFile;
+    read_entire_file *ReadEntireFile;    
 	load_texture *LoadTexture;
-    bool32 QuitRequested;
+    bool32 QuitRequested;    
 } platform_api;
 
 typedef struct button_state
