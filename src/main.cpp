@@ -39,7 +39,6 @@ static bool GlobalRunning = true;
 #include "matrix_summer.cpp"
 #include "win32_summer.cpp"
 #include "summer_opengl.cpp"
-#include "win32_threading.cpp"
 #include "win32_sound.cpp"
 #include "win32_input.cpp"
 
