@@ -1,0 +1,11 @@
+#version 330
+
+in vec2 UV;
+in vec4 inputColour;
+
+out vec4 fragColour;
+uniform sampler2D myTextureSampler;
+
+void main() {
+	fragColour = texture(myTextureSampler, UV) * inputColour;
+}

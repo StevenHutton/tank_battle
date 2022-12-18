@@ -1,0 +1,22 @@
+version(1); 
+project_name = "summerjam_bb_handmade"; 
+patterns = { 
+    "*.jai", 
+    "*.cpp", 
+    "*.c", 
+    "*.h", 
+    "*.bat", 
+    "*.cmd", 
+    "*.4coder" 
+};
+
+blacklist_patterns = { 
+    ".*", 
+}; 
+load_paths = { 
+    {
+		{ 
+            {"/", .relative = true, .recursive = true, },
+		}, .os = "win"
+	} 
+};
