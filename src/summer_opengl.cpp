@@ -353,7 +353,7 @@ static void win32_ogl_render(HDC device_context, RenderBuffer *buffer)
 	MatrixToIdentity(model_matrix);
 	MatrixToIdentity(camera_matrix);
 	//todo - figure out how I screwed up the perspective matrix to make the directions backwards?
-	MatrixTranslate44(-Global_Camera_Position.x, -Global_Camera_Position.y, -5.0f, camera_matrix);
+	MatrixTranslate44(-buffer->camera_pos.x, -buffer->camera_pos.y, -5.0f, camera_matrix);
     
 	MatrixMul44(model_matrix, camera_matrix, MVMatrix);
 	MatrixMul44(MVMatrix, GlobalPerspectiveMatrix, MVPMatrix);
@@ -396,6 +396,11 @@ static void add_quad_to_render_buffer(Quad quad, uint32 texture_handle)
 	Assert(quad_buffer->quad_count < QUAD_BUFFER_SIZE);
 	quad_buffer->quads[quad_buffer->quad_count] = quad;
 	quad_buffer->quad_count += 1;
+}
+
+static void SetCameraPosition(Vector2 cameraPos)
+{
+	global_render_buffer.camera_pos = cameraPos;
 }
 
 static void reset_quad_buffers(RenderBuffer * buffer)

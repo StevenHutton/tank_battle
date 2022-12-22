@@ -788,12 +788,11 @@ static void update_enemy(Gameplay_Data *data, Enemy *enemy, f32 dt)
 	}
 }
 
-static void SomeExampleThread(void *Data)
+extern "C" Vector2 GetCameraPosition(Game_Memory * memory)
 {
-    Gameplay_Data *GameData = (Gameplay_Data *)Data;
-    GameData;
+	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
+	return data->Camera_Pos;
 }
-
 
 extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, Input_State *Input, f32 dt)
 {
@@ -1133,4 +1132,5 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
     Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Underwood[0]), data->underwood_tex.handle);
     Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Underwood[1]), data->underwood_tex.handle);
     Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->EndScreen), data->end_tex.handle);
+	Platform.SetCameraPos(data->Camera_Pos);
 }

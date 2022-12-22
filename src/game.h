@@ -44,12 +44,12 @@ typedef struct QuadBuffer {
 } QuadBuffer;
 
 typedef struct RenderBuffer {
+	Vector2 camera_pos;
 	int buffer_count;
 	QuadBuffer *quadBuffers[QUAD_BUFFER_MAX];
 } RenderBuffer;
 
 RenderBuffer global_render_buffer;
-Vector2 Global_Camera_Position;
 
 inline void *
 Copy(size_t size, void *sourceInit, void *destInit)
@@ -62,6 +62,7 @@ Copy(size_t size, void *sourceInit, void *destInit)
 }
 
 typedef void platform_add_quad_to_render_buffer(Quad quad, uint32 texture_handle);
+typedef void set_camera_position(Vector2 pos);
 
 struct read_file_result
 {
@@ -74,10 +75,10 @@ typedef Texture load_texture(char *filename);
 typedef struct
 {
 	platform_add_quad_to_render_buffer * AddQuadToRenderBuffer;
-    
+	set_camera_position * SetCameraPos;
     read_entire_file *ReadEntireFile;    
 	load_texture *LoadTexture;
-    bool32 QuitRequested;    
+    bool32 QuitRequested;
 } platform_api;
 
 typedef struct button_state

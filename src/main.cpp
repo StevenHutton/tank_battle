@@ -285,6 +285,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	Platform.ReadEntireFile = win32_read_file;
 	Platform.LoadTexture = Get_Texture;
 	Platform.AddQuadToRenderBuffer = add_quad_to_render_buffer;
+	Platform.SetCameraPos = SetCameraPosition;
     
     WNDCLASS windowClass = {};
 	
@@ -369,9 +370,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			win32State->UpdateGamePlay(&Platform, &memory, &input_state, TargetSeconds);
 			win32State->RenderGameplay(&Platform, &memory);
         }
-		
-		Gameplay_Data * data = (Gameplay_Data *)memory.persistent_memory;
-		Global_Camera_Position = data->Camera_Pos;
         
 		win32_ogl_render(windowDC, &global_render_buffer);
 		reset_quad_buffers(&global_render_buffer);
