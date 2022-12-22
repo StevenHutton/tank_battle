@@ -38,23 +38,6 @@ typedef struct Penetration
 #define PLAYER_DRAG 3.0f
 #define MAX_VELOCITY 0.8f
 
-static void InitParallaxObjects(Entity *backgrounds, Vector2 pos, f32 width, f32 height)
-{
-	backgrounds[0].pos.x = pos.x;
-	backgrounds[0].pos.y = pos.y;
-	backgrounds[0].width = width;
-	backgrounds[0].height = height;
-	backgrounds[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    
-	backgrounds[1].pos.x = pos.x + width;
-	backgrounds[1].pos.y = pos.y;
-	backgrounds[1].width = width;
-	backgrounds[1].height = height;
-	backgrounds[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-}
-
-static int global_map_blocks = 0;
-
 static Sprite create_sprite(Texture tex, uint8 frame_count, f32 size_x, f32 size_y, 
                             f32 offset_x = 0.0f, f32 offset_y = 0.0f)
 {
@@ -256,7 +239,7 @@ static void resolve_swept_collisions_with_terrain(Entity * ent, Collision cols[]
 	}
 }
 
-static bool Is_Collision_Blocks(Entity e1, Entity e2)
+static bool Is_Penetration_Naive(Entity e1, Entity e2)
 {
 	rect r1 = GetEntityRect(e1);
     
@@ -268,33 +251,6 @@ static bool Is_Collision_Blocks(Entity e1, Entity e2)
 	return false;
 }
 
-static void update_parallax(Entity *backgrounds, Vector2 old_camera_pos, Vector2 new_camera_pos, Vector2 velocity, f32 width, uint8 &current_background)
-{
-	backgrounds[current_background].pos.x += ((new_camera_pos.x - old_camera_pos.x) * velocity.x);
-	backgrounds[current_background].pos.y += ((new_camera_pos.y - old_camera_pos.y) * velocity.y);
-    
-	int8 Signal = 1;
-	if(new_camera_pos.x < backgrounds[current_background].pos.x)
-	{
-		Signal = -1;
-	}
-	backgrounds[1-current_background].pos.x = backgrounds[current_background].pos.x + (width * Signal);
-	backgrounds[1-current_background].pos.y = backgrounds[current_background].pos.y;
-    
-	if((new_camera_pos.x > (backgrounds[current_background].pos.x + (width/2))) ||
-		(new_camera_pos.x < backgrounds[current_background].pos.x - (width/2)))
-	{
-		current_background = 1 - current_background;
-	}
-}
-
-static void update_parallax(Entity *entity, Vector2 old_camera_pos, Vector2 new_camera_pos, Vector2 velocity)
-{
-	entity->pos.x += ((new_camera_pos.x - old_camera_pos.x) * velocity.x);
-	entity->pos.y += ((new_camera_pos.y - old_camera_pos.y) * velocity.y);
-}
-
-static Vector2 Global_Camera_Offset = {};
 
 static void update_camera(Gameplay_Data * data, f32 dt, bool button_up_pressed, bool button_down_pressed)
 {
@@ -302,8 +258,8 @@ static void update_camera(Gameplay_Data * data, f32 dt, bool button_up_pressed, 
 	old_camera_pos.x = data->Camera_Pos.x;
 	old_camera_pos.y = data->Camera_Pos.y;
     
-	data->Camera_Pos.x = data->Character.pos.x + 0.2f;
-	data->Camera_Pos.y = data->Character.pos.y + Global_Camera_Offset.y + 0.15f;
+	data->Camera_Pos.x = data->Character.pos.x;
+	data->Camera_Pos.y = data->Character.pos.y;
 }
 
 static Quad make_quad(f32 pos_x, f32 pos_y, f32 width, f32 height, Color color = {1.0f, 1.0f, 1.0f, 1.0f},
@@ -429,19 +385,9 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
     
 	//TODO(shutton) : maybe put this somewhere else? Are we clearing memory when the .dll is reloaded? Maybe move memory stuff to the platform layer?
     if(!data->IsInitialized)
-    {        
-		read_file_result JumpFile = Platform.ReadEntireFile("../assets/jump_explosion.wav");
-		data->JumpSound = load_wav_from_memory(JumpFile.data);
-		
+    {		
 		read_file_result MusicFile = Platform.ReadEntireFile("../assets/music.wav");
-		data->MusicSound = load_wav_from_memory(MusicFile.data);
-
-		read_file_result deathFile = Platform.ReadEntireFile("../assets/player_ouch.wav");
-		data->DeathSound = load_wav_from_memory(deathFile.data);
-		
-		read_file_result deathFile2 = Platform.ReadEntireFile("../assets/bug_ouch.wav");
-		data->DeathSound2 = load_wav_from_memory(deathFile2.data);
-		
+		data->MusicSound = load_wav_from_memory(MusicFile.data);		
 		InitGameObjecets(memory);
 
 		AddPlaySound(&data->MusicSound, true);

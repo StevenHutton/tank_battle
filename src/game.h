@@ -26,11 +26,8 @@ typedef struct Gameplay_Data {
 	bool32 IsInitialized;	
 	Entity Character = {};
 	Vector2 Camera_Pos = {};
-	Vector2 starting_pos; 
-	Loaded_Sound JumpSound;
+	Vector2 starting_pos;
 	Loaded_Sound MusicSound;
-	Loaded_Sound DeathSound;
-	Loaded_Sound DeathSound2;
 	Sprite character_sprite;
 	Texture character_texture;
     
