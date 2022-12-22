@@ -27,9 +27,6 @@ typedef uint64_t uint64;
 typedef float f32;
 typedef int32 bool32;
 
-#define CompletePreviousReadsBeforeFutureReads _ReadBarrier()
-#define CompletePreviousWritesBeforeFutureWrites _WriteBarrier()
-
 #define Kilobytes(Value) ((Value)*1024LL)
 #define Megabytes(Value) (Kilobytes(Value)*1024LL)
 #define Gigabytes(Value) (Megabytes(Value)*1024LL)
