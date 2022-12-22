@@ -29,7 +29,6 @@ typedef struct Win32_State
     Update_Gameplay *UpdateGamePlay;
     Update_GameAudio *UpdateGameAudio;
 	Render_Gameplay *RenderGameplay;
-	Init_Game *InitGame;
 } Win32_State;
 
 Win32_State win32State_ = {0};
@@ -225,7 +224,6 @@ static void Gameplay_dll_reload(Win32_State *win32State)
 			win32State->UpdateGamePlay = 0;
 			win32State->UpdateGameAudio = 0;
 			win32State->RenderGameplay = 0;
-			win32State->InitGame = 0;
             
 			if(CopyFileA(win32State->DllFullFilePath, win32State->TempDllFullFilePath, false))
 			{
@@ -235,9 +233,8 @@ static void Gameplay_dll_reload(Win32_State *win32State)
 					win32State->UpdateGamePlay = (Update_Gameplay *)GetProcAddress(win32State->AppLibrary, "UpdateGamePlay");
 					win32State->UpdateGameAudio = (Update_GameAudio *)GetProcAddress(win32State->AppLibrary, "UpdateGameAudio");
 					win32State->RenderGameplay = (Render_Gameplay *)GetProcAddress(win32State->AppLibrary, "RenderGameplay");
-					win32State->InitGame = (Init_Game *)GetProcAddress(win32State->AppLibrary, "InitGame");
 					if(!win32State->UpdateGamePlay || !win32State->UpdateGameAudio ||
-                       !win32State->RenderGameplay || !win32State->InitGame)
+                       !win32State->RenderGameplay)
 					{
 						// TODO(kstandbridge): Error AppUpdateFrame
 						if(!FreeLibrary(win32State->AppLibrary))
@@ -326,15 +323,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	open_gl_init(win32State, window);
 	
 	Gameplay_dll_reload(win32State);
-
-	//LOAD MAP
-	char Path[MAX_PATH] = {};
-	size_t PathLength = strlen(win32State->ExeFilePath);
-	Copy(PathLength, win32State->ExeFilePath, Path);
-	AppendCString(Path + PathLength, "\\..\\assets\\map.bmp");
-	int channels, map_width, map_height;
-	void * map_data = (void *)stbi_load(Path, &map_width, &map_height, &channels, 0);
-	win32State->InitGame(map_data, map_width, map_height, &memory);
 	
 	HDC windowDC = GetDC(window);
     LARGE_INTEGER LastPerformanceCounter = Win32GetWallClock();

@@ -92,12 +92,6 @@ typedef struct button_state
 	bool ended_down;
 } button_state;
 
-#define NUM_BUTTONS 12
-
-#define NUM_BLOCKS_MAX 1024
-#define NUM_BLOCKS_MAP 100
-#define NUM_ENEMIES 10
-
 typedef void platform_add_quad_to_render_buffer(Quad quad, uint32 texture_handle);
 typedef void set_camera_position(Vector2 pos);
 
@@ -120,6 +114,7 @@ inline void *
 	return destInit;
 }
 
+#define NUM_BUTTONS 12
 typedef struct Input_State
 {    
 	union
