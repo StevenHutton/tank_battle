@@ -788,6 +788,14 @@ static void update_enemy(Gameplay_Data *data, Enemy *enemy, f32 dt)
 	}
 }
 
+extern "C" void InitGame(void * map_data, int width, int height, Game_Memory * memory)
+{
+	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
+	data->map_data = map_data;
+	data->map_width = width;
+	data->map_height = height;
+}
+
 extern "C" Vector2 GetCameraPosition(Game_Memory * memory)
 {
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;

@@ -18,7 +18,7 @@ cl -Od -W4 -wd4505 -wd4100 -wd4201 -nologo /DSLOW /DINTERNAL -FC -Zi ..\src\main
 del game_*.pdb > NUL 2> NUL
 
 echo WAITING FOR PDB > lock.tmp
-cl -Od -W4 -wd4505 -wd4100 -wd4201 -nologo /DSLOW /DINTERNAL -FC -Zi ..\src\game.cpp -LD /link  -incremental:no -opt:ref -PDB:game_%random%.pdb -EXPORT:UpdateGamePlay -EXPORT:UpdateGameAudio -EXPORT:RenderGameplay
+cl -Od -W4 -wd4505 -wd4100 -wd4201 -nologo /DSLOW /DINTERNAL -FC -Zi ..\src\game.cpp -LD /link  -incremental:no -opt:ref -PDB:game_%random%.pdb -EXPORT:UpdateGamePlay -EXPORT:UpdateGameAudio -EXPORT:RenderGameplay -EXPORT:InitGame
 del lock.tmp
 
 del /q *.exp
