@@ -35,9 +35,6 @@ typedef struct Gameplay_Data {
 	Texture character_texture;
 	Texture block_texture;
 	Sprite block_sprite;
-    
-	uint8 StarsCount = 0;
-	bool draw_title = true;
 } Gameplay_Data;
 
 #define GAME_h

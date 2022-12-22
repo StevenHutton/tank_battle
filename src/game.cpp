@@ -61,14 +61,14 @@ static void InitGameObjecets(Game_Memory * memory)
 {
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
 
-	data->character_sprite = create_sprite(data->character_texture, 1, 0.1f, 0.1f, 0.f, 0.035f);
-	data->Character.width = 0.05f;
-	data->Character.height = 0.05f;
+	data->character_sprite = create_sprite(data->character_texture, 1, 0.1f, 0.1f);
+	data->Character.width = 0.1f;
+	data->Character.height = 0.1f;
 	data->Character.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->Character.sprite = data->character_sprite;
 
-	float x = -1.5f;
-	float y = 0.5f;
+	float x = 0.0f;
+	float y = 0.0f;
 	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
 	{
 		if (i % 10 == 0) y -= .1f;
@@ -76,7 +76,7 @@ static void InitGameObjecets(Game_Memory * memory)
 
 		data->blocks[i].pos = {x, y};
 		data->blocks[i].width = 0.1f;
-		data->blocks[i].height = 0.1f;	
+		data->blocks[i].height = 0.1f;
 		data->blocks[i].color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 
@@ -168,7 +168,7 @@ static int get_worst_pen_index(Penetration pens[], int pen_count)
 
 static bool Is_Collision(Entity e1, Entity e2, Collision& col, f32 dt)
 {
-	rect r = GetExpandedRect(e2, e1.width / 4.0f, e1.height / 4.0f);
+	rect r = GetExpandedRect(e2, e1.width/2, e1.height/2, 0.05f);
 	
 	//check for obvious misses
 	if(e1.velocity.x == 0.0f &&
@@ -442,21 +442,82 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
     
 	//sweapt phase collision detection - adjust velocity to prevent collision
 	Collision collision = {};
-	Collision cols[100];
+	Collision cols[NUM_BLOCKS_MAP];
 	int num_cols = 0;
+	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
+	{
+		if (Is_Collision(data->Character, data->blocks[i], collision, dt))
+		{
+			cols[num_cols] = collision;
+			num_cols++;
+		}
+	}
 	resolve_swept_collisions_with_terrain(&data->Character, cols, num_cols);
-        
+		       
 	//update character position	
 	data->Character.pos.x += data->Character.velocity.x * dt;
 	data->Character.pos.y += data->Character.velocity.y * dt;
+
+	//penetration phase collision detection
+	Penetration pen;
+	Penetration pens[20];
+	int num_pens = 0;
+	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
+	{
+		if (Is_Penetration(data->Character, data->blocks[i], pen))
+		{
+			pens[num_pens] = pen;
+			num_pens++;
+		}
+	}
+
+	int worst_pen_index = get_worst_pen_index(pens, num_pens);
+	int loop_count = 0;
+	while (worst_pen_index != -1)
+	{
+		pen = pens[worst_pen_index];		
+		data->Character.pos = data->Character.pos + (pen.depth * pen.normal);
+		if (pen.normal.x == 1)
+		{
+			data->Character.velocity.x = maxf(data->Character.velocity.x, 0.0f);
+		}
+		else if (pen.normal.x == -1)
+		{
+			data->Character.velocity.x = minf(data->Character.velocity.x, 0.0f);
+		}
+		
+		if (pen.normal.y == 1)
+		{
+			data->Character.velocity.y = maxf(data->Character.velocity.y, 0.0f);
+		}
+		else if (pen.normal.y == -1)
+		{
+			data->Character.velocity.y = minf(data->Character.velocity.y, 0.0f);
+		}
+        
+		num_pens = 0;
+		for (uint32 i = 0; i < NUM_BLOCKS_MAP; i++)
+		{
+			if (Is_Penetration(data->Character, data->blocks[i], pen))
+			{
+				pens[num_pens] = pen;
+				num_pens++;
+			}
+		}
+		worst_pen_index = get_worst_pen_index(pens, num_pens);
+		loop_count++;
+        
+		if (loop_count >= 100)
+		{
+			data->Character.pos.y += 0.1f;
+            
+			break;
+		}
+	}
+
     
 	update_sprite(data, &data->Character.sprite, dt);
     update_camera(data, dt, Input->MoveUp.ended_down, Input->MoveDown.ended_down);
-
-	if (data->Camera_Pos.x > 2.0f)
-	{
-		data->draw_title = false;
-	}
 }
 
 extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
