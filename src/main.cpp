@@ -373,7 +373,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		Gameplay_Data * data = (Gameplay_Data *)memory.persistent_memory;
 		Global_Camera_Position = data->Camera_Pos;
         
-		win32_ogl_render(windowDC, &global_render_buffer);        
+		win32_ogl_render(windowDC, &global_render_buffer);
 		reset_quad_buffers(&global_render_buffer);
         
 		Win32UpdateAudioThread(win32State);

@@ -88,7 +88,7 @@ static void Win32UpdateAudioThread(void *Data)
     Win32_State *Win32State = (Win32_State *)Data;
     game_sound_buffer *SoundBuffer = &Win32State->SoundBuffer;
     
-    f32 TargetDeltaTime = 0.0166f;    
+    f32 TargetDeltaTime = 0.0166f;
     
 	DWORD SafetyBytes = (DWORD)((f32)(SoundBuffer->SamplesPerSecond*SoundBuffer->BytesPerSample)*TargetDeltaTime*1); 
 	SafetyBytes -= SafetyBytes % SoundBuffer->BytesPerSample;

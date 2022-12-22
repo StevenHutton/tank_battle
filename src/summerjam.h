@@ -35,22 +35,6 @@ typedef int32 bool32;
 #define Gigabytes(Value) (Megabytes(Value)*1024LL)
 #define Terabytes(Value) (Gigabytes(Value)*1024LL)
 
-inline uint32 
-AtomicCompareExchangeU32(uint32 volatile *Value, uint32 New, uint32 Expected)
-{
-    uint32 Result = _InterlockedCompareExchange((long volatile *)Value, New, Expected);
-    
-    return Result;
-}
-
-inline uint32
-AtomicIncrementU32(uint32 volatile *Value)
-{
-    uint32 Result = _InterlockedIncrement((long volatile *)Value);
-    
-    return Result;
-}
-
 inline uint32
 RoundF32ToUint32(f32 Value)
 {
