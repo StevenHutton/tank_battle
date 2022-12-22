@@ -61,9 +61,9 @@ static void InitGameObjecets(Game_Memory * memory)
 {
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
 
-	data->character_sprite = create_sprite(data->character_texture, 1, 0.075f, 0.15f, 0.f, 0.035f);
+	data->character_sprite = create_sprite(data->character_texture, 1, 0.15f, 0.15f, 0.f, 0.035f);
 	data->Character.width = 0.05f;
-	data->Character.height = 0.08f;
+	data->Character.height = 0.05f;
 	data->Character.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->Character.sprite = data->character_sprite;
 	data->Camera_Pos = { 0.3f, 0.0f };	    
@@ -373,25 +373,19 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
     
 	platform_api Platform = *PlatformAPI;
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
-#if 0
-    // NOTE(kstandbridge): This is how you would run something in a seperate thread,
-    // the game will stall until all these threads finish each frame
-    // use Platform.BackgroundWorkQueue if the thread is not frame dependant
-    Platform.AddWorkEntry(Platform.PerFrameWorkQueue, SomeExampleThread, data);
-    
-    // NOTE(kstandbridge): You can block this thread and wait for all threads to complete by calling CompleteAllWork and specifying which queue
-    Platform.CompleteAllWork(Platform.PerFrameWorkQueue);
-#endif
     
 	//TODO(shutton) : maybe put this somewhere else? Are we clearing memory when the .dll is reloaded? Maybe move memory stuff to the platform layer?
     if(!data->IsInitialized)
     {		
 		read_file_result MusicFile = Platform.ReadEntireFile("../assets/music.wav");
-		data->MusicSound = load_wav_from_memory(MusicFile.data);		
+		data->MusicSound = load_wav_from_memory(MusicFile.data);	
+
+		data->character_texture = Platform.LoadTexture("../assets/tank_base.png");
 		InitGameObjecets(memory);
 
 		AddPlaySound(&data->MusicSound, true);
         SpawnPlayer(data);
+				
         data->IsInitialized = true;
     }
 

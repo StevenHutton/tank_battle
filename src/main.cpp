@@ -7,7 +7,6 @@
 #include "includes/stb_image.h"
 #include "summerjam.h"
 #include "audio.h"
-//#include "game.h"
 
 static platform_api Platform;
 
@@ -162,12 +161,8 @@ static void Win32ProcessPendingMessages(Input_State &input_result)
 						case 'E':       { Win32ProcessKeyboardButton(&input_result.RightShoulder, IsDown); } break;
 						case VK_UP:     { Win32ProcessKeyboardButton(&input_result.ActionUp, IsDown); } break;
 						case VK_LEFT:   { Win32ProcessKeyboardButton(&input_result.ActionLeft, IsDown); } break;
-                        //case VK_DOWN:   { Win32ProcessKeyboardButton(&Controller.ActionDown, IsDown); } break;
 						case VK_RIGHT:  { Win32ProcessKeyboardButton(&input_result.ActionRight, IsDown); } break;
                         case VK_ESCAPE: { Win32ProcessKeyboardButton(&input_result.Back, IsDown); } break;
-                        //case VK_SPACE:  { Win32ProcessKeyboardButton(&Controller.Start, IsDown); } break;
-                        
-                        // NOTE(kstandbridge): We use space to jump so that would be A (button button) on controller
 						case VK_SPACE:  { Win32ProcessKeyboardButton(&input_result.ActionDown, IsDown); } break;
                     }
                 }
@@ -218,7 +213,8 @@ static void Gameplay_dll_reload(Win32_State *win32State)
 		{            
 			if(win32State->AppLibrary && !FreeLibrary(win32State->AppLibrary))
 			{
-				// TODO(kstandbridge): Error freeing app library
+				// TODO: Error freeing app library
+				Assert(false);
 			}
 			win32State->AppLibrary = 0;
 			win32State->UpdateGamePlay = 0;
@@ -236,10 +232,11 @@ static void Gameplay_dll_reload(Win32_State *win32State)
 					if(!win32State->UpdateGamePlay || !win32State->UpdateGameAudio ||
                        !win32State->RenderGameplay)
 					{
-						// TODO(kstandbridge): Error AppUpdateFrame
+						// TODO : Error AppUpdateFrame
 						if(!FreeLibrary(win32State->AppLibrary))
 						{
-							// TODO(kstandbridge): Error freeing app library
+							// TODO : Error freeing app library
+							Assert(false);
 						}
 					}
 					win32State->LastDLLWriteTime = NewDLLWriteTime;                        
@@ -247,7 +244,8 @@ static void Gameplay_dll_reload(Win32_State *win32State)
 			}
 			else
 			{
-				// TODO(kstandbridge): Error copying temp dll
+				// TODO : Error copying temp dll
+				Assert(false);
 			}
 		}
 	}
@@ -321,9 +319,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
     Win32_State *win32State = &win32State_;    
     Win32GetFilePaths(win32State);    
 	open_gl_init(win32State, window);
-	
-	Gameplay_dll_reload(win32State);
-	
+		
 	HDC windowDC = GetDC(window);
     LARGE_INTEGER LastPerformanceCounter = Win32GetWallClock();
     

@@ -317,7 +317,7 @@ static void open_gl_init(Win32_State *win32State, HWND window)
 
 static void draw_quads(QuadBuffer *buffer)
 {	
-	QuadBuffer quad_buffer = *buffer;	
+	QuadBuffer quad_buffer = *buffer;
 	glBindTexture(GL_TEXTURE_2D, quad_buffer.texture_handle);    
 	    
 	//send buffer data to card
