@@ -22,10 +22,12 @@ typedef struct Entity {
 	Sprite sprite;
 } Entity;
 
+#define NUM_BLOCKS_MAP 100
+
 typedef struct Gameplay_Data {
-	bool32 IsInitialized;	
+	bool32 IsInitialized;
 	Entity Character = {};
-	Entity Block = {};
+	Entity blocks[NUM_BLOCKS_MAP];
 	Vector2 Camera_Pos = {};
 	Vector2 starting_pos;
 	Loaded_Sound MusicSound;

@@ -61,12 +61,26 @@ static void InitGameObjecets(Game_Memory * memory)
 {
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
 
-	data->character_sprite = create_sprite(data->character_texture, 1, 0.15f, 0.15f, 0.f, 0.035f);
+	data->character_sprite = create_sprite(data->character_texture, 1, 0.1f, 0.1f, 0.f, 0.035f);
 	data->Character.width = 0.05f;
 	data->Character.height = 0.05f;
 	data->Character.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->Character.sprite = data->character_sprite;
-	data->Camera_Pos = { 0.3f, 0.0f };	    
+
+	float x = -1.5f;
+	float y = 0.5f;
+	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
+	{
+		if (i % 10 == 0) y -= .1f;
+		x += 0.1f;
+
+		data->blocks[i].pos = {x, y};
+		data->blocks[i].width = 0.1f;
+		data->blocks[i].height = 0.1f;	
+		data->blocks[i].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	}
+
+	data->Camera_Pos = { 0.3f, 0.0f };
 }
 
 static rect GetEntityRect(Entity ent)
@@ -380,9 +394,10 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 		data->MusicSound = load_wav_from_memory(MusicFile.data);
 
 		data->character_texture = Platform.LoadTexture("../assets/tank_base.png");
+		data->block_texture = Platform.LoadTexture("../assets/grass.png");
 		InitGameObjecets(memory);
 
-		AddPlaySound(&data->MusicSound, true);
+		//AddPlaySound(&data->MusicSound, true);
         SpawnPlayer(data);
 
         data->IsInitialized = true;
@@ -400,16 +415,22 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 	}
 	else acceleration.x = 0.0f;
 
-	if (Input->MoveLeft.ended_down)
+	if (Input->MoveDown.ended_down)
 	{
 		acceleration.y = -1.0f;
 	}
-	else if (Input->MoveRight.ended_down)
+	else if (Input->MoveUp.ended_down)
 	{
 		acceleration.y = 1.0f;
 	}
 	else acceleration.y = 0.0f;
     
+	f32 dragX = -3.0f * data->Character.velocity.x;
+	acceleration.x += dragX;
+
+	f32 dragY = -3.0f * data->Character.velocity.y;
+	acceleration.y += dragY;
+
 	if (abs(data->Character.velocity.x) <= 0.01f)
 		data->Character.velocity.x = 0.0f;
 
@@ -443,6 +464,10 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
 	platform_api Platform = *PlatformAPI;
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
     
-    Platform.AddQuadToRenderBuffer(make_quad_from_entity_sprite(data->Character), data->Character.sprite.tex.handle);
+	Platform.AddQuadToRenderBuffer(make_quad_from_entity_sprite(data->Character), data->Character.sprite.tex.handle);
+	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
+	{
+		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->blocks[i]), data->block_texture.handle);
+	}
 	Platform.SetCameraPos(data->Camera_Pos);
 }
