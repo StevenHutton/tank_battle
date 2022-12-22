@@ -343,6 +343,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
     while(GlobalRunning)
 	{
 		Gameplay_dll_reload(win32State);
+
 		//input handling
 		for (int i = 0; i < NUM_BUTTONS; i++)
 		{
@@ -355,6 +356,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		{
 			get_gamepad_input(XInputState, Old_XInputState, input_state);
 		}
+
         if(win32State->UpdateGamePlay && win32State->RenderGameplay)
         {
 			win32State->UpdateGamePlay(&Platform, &memory, &input_state, TargetSeconds);

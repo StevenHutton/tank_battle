@@ -22,14 +22,17 @@ typedef struct Entity {
 	Sprite sprite;
 } Entity;
 
-typedef struct Gameplay_Data {	
+typedef struct Gameplay_Data {
 	bool32 IsInitialized;	
 	Entity Character = {};
+	Entity Block = {};
 	Vector2 Camera_Pos = {};
 	Vector2 starting_pos;
 	Loaded_Sound MusicSound;
 	Sprite character_sprite;
 	Texture character_texture;
+	Texture block_texture;
+	Sprite block_sprite;
     
 	uint8 StarsCount = 0;
 	bool draw_title = true;

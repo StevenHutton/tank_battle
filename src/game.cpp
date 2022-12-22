@@ -251,7 +251,6 @@ static bool Is_Penetration_Naive(Entity e1, Entity e2)
 	return false;
 }
 
-
 static void update_camera(Gameplay_Data * data, f32 dt, bool button_up_pressed, bool button_down_pressed)
 {
 	Vector2 old_camera_pos;
@@ -378,19 +377,19 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
     if(!data->IsInitialized)
     {		
 		read_file_result MusicFile = Platform.ReadEntireFile("../assets/music.wav");
-		data->MusicSound = load_wav_from_memory(MusicFile.data);	
+		data->MusicSound = load_wav_from_memory(MusicFile.data);
 
 		data->character_texture = Platform.LoadTexture("../assets/tank_base.png");
 		InitGameObjecets(memory);
 
 		AddPlaySound(&data->MusicSound, true);
         SpawnPlayer(data);
-				
+
         data->IsInitialized = true;
     }
 
 	Vector2 acceleration = {};
-	    
+	
 	if (Input->MoveLeft.ended_down)
 	{
 		acceleration.x = -1.0f;
@@ -400,9 +399,22 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 		acceleration.x = 1.0f;
 	}
 	else acceleration.x = 0.0f;
+
+	if (Input->MoveLeft.ended_down)
+	{
+		acceleration.y = -1.0f;
+	}
+	else if (Input->MoveRight.ended_down)
+	{
+		acceleration.y = 1.0f;
+	}
+	else acceleration.y = 0.0f;
     
 	if (abs(data->Character.velocity.x) <= 0.01f)
 		data->Character.velocity.x = 0.0f;
+
+	if (abs(data->Character.velocity.y) <= 0.01f)
+		data->Character.velocity.y = 0.0f;
 	
 	data->Character.velocity.x += acceleration.x * dt;
 	data->Character.velocity.y += acceleration.y * dt;
