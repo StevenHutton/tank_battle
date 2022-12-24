@@ -370,6 +370,8 @@ static void SpawnPlayer(Gameplay_Data *data)
 	data->Character.velocity.y = 0.0f;    	
 }
 
+#define DRAG_FACTOR 4.0f
+
 extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, Input_State *Input, f32 dt)
 {    
     if(WasPressed(Input->Back))
@@ -409,7 +411,6 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 	}
 
 	Vector2 north = { 0.f, 1.f };
-
 	Vector2 forward = Rotate(north, player->rotation);
 
 	if (Input->MoveDown.ended_down)
@@ -422,17 +423,11 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 	}
 	else acceleration = { 0.0f, 0.f };
     
-	f32 dragX = -3.0f * data->Character.velocity.x;
+	f32 dragX = -DRAG_FACTOR * data->Character.velocity.x;
 	acceleration.x += dragX;
 
-	f32 dragY = -3.0f * data->Character.velocity.y;
+	f32 dragY = -DRAG_FACTOR * data->Character.velocity.y;
 	acceleration.y += dragY;
-
-	if (abs(data->Character.velocity.x) <= 0.01f)
-		data->Character.velocity.x = 0.0f;
-
-	if (abs(data->Character.velocity.y) <= 0.01f)
-		data->Character.velocity.y = 0.0f;
 	
 	data->Character.velocity.x += acceleration.x * dt;
 	data->Character.velocity.y += acceleration.y * dt;
@@ -510,9 +505,7 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
             
 			break;
 		}
-	}
-
-    
+	}    
 	update_sprite(data, &data->Character.sprite, dt);
     update_camera(data, dt, Input->MoveUp.ended_down, Input->MoveDown.ended_down);
 }
@@ -522,7 +515,7 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
 	platform_api Platform = *PlatformAPI;
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
     
-	Platform.AddQuadToRenderBuffer(make_quad_from_entity_sprite(data->Character), data->Character.sprite.tex.handle);
+	Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Character), data->character_texture.handle);
 	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
 	{
 		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->blocks[i]), data->block_texture.handle);
