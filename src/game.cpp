@@ -317,29 +317,24 @@ static Quad make_quad_from_entity_sprite(Entity entity)
 	Quad result;
 	Sprite sprite = entity.sprite;
 	Texture tex = entity.sprite.tex;
-	Vector2 pos = entity.pos + sprite.offset;
-    
-	f32 hw = sprite.size.x / 2;
-	f32 hh = sprite.size.y / 2;
-    
-	f32 left = pos.x - hw;
-	f32 right = pos.x + hw;
-	f32 top = pos.y + hh;
-	f32 bottom = pos.y - hh;
-    
-	f32 uvl = 0.0f;
-	f32 uvr = 1.0f;
+
+	f32 uvl = (sprite.current_frame * sprite.frame_width) / (float)tex.width;
+	f32 uvr = ((sprite.current_frame+1) * sprite.frame_width) / (float)tex.width;
 	f32 uvt = 0.0f;
-	f32 uvb = 1.0f;
-    
-	uvl = (sprite.current_frame * sprite.frame_width) / (float)tex.width;
-	uvr = ((sprite.current_frame+1) * sprite.frame_width) / (float)tex.width;
-	    
-	result.verts[0] = { { left, top, 0.0f }, { uvl, uvt }, entity.color };//0 - lt
-	result.verts[1] = { { right, top, 0.0f }, { uvr, uvt }, entity.color };//1 - rt
-	result.verts[2] = { { right, bottom, 0.0f }, { uvr, uvb }, entity.color };//2 - rb
-	result.verts[3] = { { left, bottom, 0.0f }, { uvl, uvb }, entity.color };//3 - lb
-    
+	f32 uvb = 1.0f;	
+	
+	Vector2 pos = entity.pos + sprite.offset;
+	result = make_quad(pos.x, pos.y, sprite.size.x, sprite.size.y, entity.rotation, entity.color);
+
+	result.verts[0].uv[0] = uvl;
+	result.verts[0].uv[1] = uvt;
+	result.verts[1].uv[0] = uvr;
+	result.verts[1].uv[1] = uvt;
+	result.verts[2].uv[0] = uvr;
+	result.verts[2].uv[1] = uvb;
+	result.verts[3].uv[0] = uvl;
+	result.verts[3].uv[1] = uvb;
+
 	return result;
 }
 
