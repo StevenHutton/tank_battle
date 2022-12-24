@@ -298,10 +298,10 @@ static Quad make_quad(f32 pos_x, f32 pos_y, f32 width, f32 height, float rotatio
 		uvr = temp;
 	}
 	    
-	result.verts[0] = { { (-hw * ct + hh * -st) + pos_x, (-hw * st + hh * ct) + pos_y, 0.0f }, { uvl, uvt }, color };//0 - lt
-	result.verts[1] = { { (hw * ct + hh * -st) + pos_x, (hw * st + hh * ct) + pos_y, 0.0f }, { uvr, uvt }, color };//1 - rt
-	result.verts[2] = { { (hw * ct + -hh * -st) + pos_x, (hw * st + -hh * ct) + pos_y, 0.0f }, { uvr, uvb }, color };//2 - rb
-	result.verts[3] = { { (-hw * ct + -hh * -st) + pos_x, (-hw * st + -hh * ct) + pos_y, 0.0f }, { uvl, uvb }, color };//3 - lb
+	result.verts[0] = { { (-hw * ct + hh * st) + pos_x, (-hw * -st + hh * ct) + pos_y, 0.0f }, { uvl, uvt }, color };//0 - lt
+	result.verts[1] = { { (hw * ct + hh * st) + pos_x, (hw * -st + hh * ct) + pos_y, 0.0f }, { uvr, uvt }, color };//1 - rt
+	result.verts[2] = { { (hw * ct + -hh * st) + pos_x, (hw * -st + -hh * ct) + pos_y, 0.0f }, { uvr, uvb }, color };//2 - rb
+	result.verts[3] = { { (-hw * ct + -hh * st) + pos_x, (-hw * -st + -hh * ct) + pos_y, 0.0f }, { uvl, uvb }, color };//3 - lb
     
 	return result;
 }
@@ -397,16 +397,16 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
     }
 
 	Vector2 acceleration = {};
+	Entity * player = &data->Character;
 	
 	if (Input->MoveLeft.ended_down)
 	{
-		acceleration.x = -1.0f;
+		player->rotation -= 0.01f;
 	}
 	else if (Input->MoveRight.ended_down)
 	{
-		acceleration.x = 1.0f;
+		player->rotation += 0.01f;
 	}
-	else acceleration.x = 0.0f;
 
 	if (Input->MoveDown.ended_down)
 	{

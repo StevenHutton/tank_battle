@@ -23,7 +23,7 @@ typedef struct Entity {
 	Sprite sprite;
 } Entity;
 
-#define NUM_BLOCKS_MAP 100
+#define NUM_BLOCKS_MAP 1
 
 typedef struct Gameplay_Data {
 	bool32 IsInitialized;
