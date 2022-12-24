@@ -408,15 +408,19 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 		player->rotation += 0.01f;
 	}
 
+	Vector2 north = { 0.f, 1.f };
+
+	Vector2 forward = Rotate(north, player->rotation);
+
 	if (Input->MoveDown.ended_down)
 	{
-		acceleration.y = -1.0f;
+		acceleration = -1.0f * forward;
 	}
 	else if (Input->MoveUp.ended_down)
 	{
-		acceleration.y = 1.0f;
+		acceleration = forward;
 	}
-	else acceleration.y = 0.0f;
+	else acceleration = { 0.0f, 0.f };
     
 	f32 dragX = -3.0f * data->Character.velocity.x;
 	acceleration.x += dragX;

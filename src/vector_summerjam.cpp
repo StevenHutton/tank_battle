@@ -34,6 +34,22 @@ Vector2 operator*( Vector2 const& lhs, Vector2 const& rhs )
 	return result;
 }
 
+Vector2 operator*( Vector2 const& lhs, float rhs )
+{
+	Vector2 result;
+	result.x = lhs.x * rhs;
+	result.y = lhs.y * rhs;
+	return result;
+}
+
+Vector2 operator*( float const& lhs, Vector2 rhs )
+{
+	Vector2 result;
+	result.x = lhs * rhs.x;
+	result.y = lhs * rhs.y;
+	return result;
+}
+
 static Vector2 Rotate(Vector2 const& vec, float rotate)
 {
 	Vector2 result = vec;
