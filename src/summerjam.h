@@ -63,7 +63,7 @@ typedef union Color
 } Color;
 
 typedef struct Vertex {
-	float verts[3];
+	float xyz[3];
 	float uv[2];
 	Color color = { 1.0f, 1.0f, 1.0f, 1.0f };
 } Vertex;

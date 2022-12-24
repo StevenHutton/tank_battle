@@ -296,8 +296,8 @@ static void open_gl_init(Win32_State *win32State, HWND window)
 	const GLdouble pi = 3.1415926535897932384626433832795;
 	float aspect = (float)windowDimensions.width/(float)windowDimensions.height;
 	float halfAspect = aspect/2.0f; 
-	float zNear = 0.1f;
-	float zFar = 100.0f;
+	float zNear = -0.1f;
+	float zFar = -100.0f;
 	float fov = 45.0f;
 	
 	fH = (float)tan( fov / 360 * pi ) * zNear;
@@ -353,7 +353,7 @@ static void win32_ogl_render(HDC device_context, RenderBuffer *buffer)
 	MatrixToIdentity(model_matrix);
 	MatrixToIdentity(camera_matrix);
 	//todo - figure out how I screwed up the perspective matrix to make the directions backwards?
-	MatrixTranslate44(-buffer->camera_pos.x, -buffer->camera_pos.y, -5.0f, camera_matrix);
+	MatrixTranslate44(-buffer->camera_pos.x, -buffer->camera_pos.y, 5.0f, camera_matrix);
     
 	MatrixMul44(model_matrix, camera_matrix, MVMatrix);
 	MatrixMul44(MVMatrix, GlobalPerspectiveMatrix, MVPMatrix);

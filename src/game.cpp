@@ -104,8 +104,8 @@ static rect GetExpandedRect(Entity ent, f32 halfWidth, f32 halfHeight, f32 modif
 	
 	r.left = r.left - halfWidth - modifier;
 	r.right = r.right + halfWidth + modifier;
-	r.top = r.top + halfHeight - modifier;
-	r.bottom = r.bottom - halfHeight + modifier;
+	r.top = r.top + halfHeight + modifier;
+	r.bottom = r.bottom - halfHeight - modifier;
 	
 	return r;
 }
@@ -168,7 +168,7 @@ static int get_worst_pen_index(Penetration pens[], int pen_count)
 
 static bool Is_Collision(Entity e1, Entity e2, Collision& col, f32 dt)
 {
-	rect r = GetExpandedRect(e2, e1.width/2, e1.height/2, 0.05f);
+	rect r = GetExpandedRect(e2, e1.width/2, e1.height/2, -0.01f);
 	
 	//check for obvious misses
 	if(e1.velocity.x == 0.0f &&
@@ -275,18 +275,16 @@ static void update_camera(Gameplay_Data * data, f32 dt, bool button_up_pressed, 
 	data->Camera_Pos.y = data->Character.pos.y;
 }
 
-static Quad make_quad(f32 pos_x, f32 pos_y, f32 width, f32 height, Color color = {1.0f, 1.0f, 1.0f, 1.0f},
+static Quad make_quad(f32 pos_x, f32 pos_y, f32 width, f32 height, float rotation = 0.f, Color color = {1.0f, 1.0f, 1.0f, 1.0f},
 	bool flip_x = false)
 {
 	Quad result;
+		
+	float st = sinf(rotation);
+	float ct = cosf(rotation);
     
 	f32 hw = width / 2;
 	f32 hh = height / 2;
-    
-	f32 left = pos_x - hw;
-	f32 right = pos_x + hw;
-	f32 top = pos_y + hh;
-	f32 bottom = pos_y - hh;
     
 	f32 uvl = 0.0f;
 	f32 uvr = 1.0f;
@@ -299,11 +297,11 @@ static Quad make_quad(f32 pos_x, f32 pos_y, f32 width, f32 height, Color color =
 		uvl = uvr;
 		uvr = temp;
 	}
-    
-	result.verts[0] = { { left, top, 0.0f }, { uvl, uvt }, color };//0 - lt
-	result.verts[1] = { { right, top, 0.0f }, { uvr, uvt }, color };//1 - rt
-	result.verts[2] = { { right, bottom, 0.0f }, { uvr, uvb }, color };//2 - rb
-	result.verts[3] = { { left, bottom, 0.0f }, { uvl, uvb }, color };//3 - lb
+	    
+	result.verts[0] = { { (-hw * ct + hh * -st) + pos_x, (-hw * st + hh * ct) + pos_y, 0.0f }, { uvl, uvt }, color };//0 - lt
+	result.verts[1] = { { (hw * ct + hh * -st) + pos_x, (hw * st + hh * ct) + pos_y, 0.0f }, { uvr, uvt }, color };//1 - rt
+	result.verts[2] = { { (hw * ct + -hh * -st) + pos_x, (hw * st + -hh * ct) + pos_y, 0.0f }, { uvr, uvb }, color };//2 - rb
+	result.verts[3] = { { (-hw * ct + -hh * -st) + pos_x, (-hw * st + -hh * ct) + pos_y, 0.0f }, { uvl, uvb }, color };//3 - lb
     
 	return result;
 }
@@ -311,7 +309,7 @@ static Quad make_quad(f32 pos_x, f32 pos_y, f32 width, f32 height, Color color =
 static Quad make_quad_from_entity(Entity entity)
 {
 	return make_quad(entity.pos.x, entity.pos.y, 
-	                 entity.width, entity.height, entity.color);
+	                 entity.width, entity.height, entity.rotation, entity.color);
 }
 
 static Quad make_quad_from_entity_sprite(Entity entity)

@@ -15,6 +15,7 @@ typedef struct Sprite {
 typedef struct Entity {
 	Vector2 pos;
 	Vector2 velocity;
+	float rotation;
 	
 	f32 width;
 	f32 height;
