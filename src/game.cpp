@@ -389,7 +389,8 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 		data->MusicSound = load_wav_from_memory(MusicFile.data);
 
 		data->character_texture = Platform.LoadTexture("../assets/tank_base.png");
-		data->block_texture = Platform.LoadTexture("../assets/grass.png");
+		data->turret_texture = Platform.LoadTexture("../assets/tank_turret.png");
+		data->block_texture = Platform.LoadTexture("../assets/block.png");
 		InitGameObjecets(memory);
 
 		//AddPlaySound(&data->MusicSound, true);
@@ -408,6 +409,15 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 	else if (Input->MoveRight.ended_down)
 	{
 		player->rotation += 0.01f;
+	}
+
+	if (Input->ActionLeft.ended_down)
+	{
+		data->turret_rotation -= 0.01f;
+	}
+	else if (Input->ActionRight.ended_down)
+	{
+		data->turret_rotation += 0.01f;
 	}
 
 	Vector2 north = { 0.f, 1.f };
@@ -516,6 +526,9 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
     
 	Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Character), data->character_texture.handle);
+	Platform.AddQuadToRenderBuffer(make_quad(data->Character.pos.x,
+	                                         data->Character.pos.y, 0.15f, 0.15f,
+	                                         data->turret_rotation), data->turret_texture.handle);
 	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
 	{
 		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->blocks[i]), data->block_texture.handle);

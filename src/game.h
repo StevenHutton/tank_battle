@@ -28,12 +28,14 @@ typedef struct Entity {
 typedef struct Gameplay_Data {
 	bool32 IsInitialized;
 	Entity Character = {};
+	f32 turret_rotation = {};
 	Entity blocks[NUM_BLOCKS_MAP];
 	Vector2 Camera_Pos = {};
 	Vector2 starting_pos;
 	Loaded_Sound MusicSound;
 	Sprite character_sprite;
 	Texture character_texture;
+	Texture turret_texture;
 	Texture block_texture;
 	Sprite block_sprite;
 } Gameplay_Data;
