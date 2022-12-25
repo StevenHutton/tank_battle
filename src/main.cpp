@@ -13,7 +13,6 @@ static platform_api Platform;
 typedef void Update_Gameplay(platform_api *PlatformAPI, Game_Memory *memory, struct Input_State *Input, f32 dt);
 typedef void Update_GameAudio(game_sound_buffer *SoundBuffer, f32 DeltaTime);
 typedef void Render_Gameplay(platform_api *PlatformAPI, Game_Memory *memory);
-typedef void Init_Game(void * map_data, int w, int h, Game_Memory * memory);
 
 typedef struct Win32_State
 {
