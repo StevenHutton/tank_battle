@@ -296,6 +296,7 @@ static void open_gl_init(Win32_State *win32State, HWND window)
 	const GLdouble pi = 3.1415926535897932384626433832795;
 	float aspect = (float)windowDimensions.width/(float)windowDimensions.height;
 	float halfAspect = aspect/2.0f; 
+	halfAspect *= 30.f;
 	float zNear = -0.1f;
 	float zFar = -100.0f;
 	float fov = 45.0f;
@@ -307,7 +308,7 @@ static void open_gl_init(Win32_State *win32State, HWND window)
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvi(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	
-	get_orthographic(-halfAspect, halfAspect, 0.5f, -0.5f, zNear, zFar, GlobalPerspectiveMatrix);
+	get_orthographic(-halfAspect, halfAspect, 15.0f, -15.f, zNear, zFar, GlobalPerspectiveMatrix);
     
 	ogl_init_quad_buffers();
 	ogl_init_shaders(win32State);

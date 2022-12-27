@@ -61,9 +61,9 @@ static void InitGameObjecets(Game_Memory * memory)
 {
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
 
-	data->character_sprite = create_sprite(data->character_texture, 1, 0.1f, 0.1f);
-	data->Character.width = 0.1f;
-	data->Character.height = 0.1f;
+	data->character_sprite = create_sprite(data->character_texture, 1, 1.f, 1.f);
+	data->Character.width = 1.0f;
+	data->Character.height = 1.0f;
 	data->Character.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->Character.sprite = data->character_sprite;
 
@@ -75,8 +75,8 @@ static void InitGameObjecets(Game_Memory * memory)
 		x += 0.1f;
 
 		data->blocks[i].pos = {x, y};
-		data->blocks[i].width = 0.1f;
-		data->blocks[i].height = 0.1f;
+		data->blocks[i].width = 1.00f;
+		data->blocks[i].height = 1.00f;
 		data->blocks[i].color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 
@@ -371,6 +371,7 @@ static void SpawnPlayer(Gameplay_Data *data)
 }
 
 #define DRAG_FACTOR 4.0f
+#define TANK_SPEED 5.0f
 
 extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, Input_State *Input, f32 dt)
 {    
@@ -425,11 +426,11 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 
 	if (Input->MoveDown.ended_down)
 	{
-		acceleration = -1.0f * forward;
+		acceleration = -TANK_SPEED * forward;
 	}
 	else if (Input->MoveUp.ended_down)
 	{
-		acceleration = forward;
+		acceleration = TANK_SPEED * forward;
 	}
 	else acceleration = { 0.0f, 0.f };
     
@@ -527,7 +528,7 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
     
 	Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Character), data->character_texture.handle);
 	Platform.AddQuadToRenderBuffer(make_quad(data->Character.pos.x,
-	                                         data->Character.pos.y, 0.15f, 0.15f,
+	                                         data->Character.pos.y, 1.0f, 1.0f,
 	                                         data->turret_rotation), data->turret_texture.handle);
 	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
 	{
