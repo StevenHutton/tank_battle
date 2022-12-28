@@ -66,21 +66,31 @@ static void InitGameObjecets(Game_Memory * memory)
 	data->Character.height = 1.0f;
 	data->Character.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->Character.sprite = data->character_sprite;
-
-	float x = 0.0f;
-	float y = 0.0f;
-	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
+	data->Character.pos = {15.f, 15.f};
+	
+	int count = 0;
+	uint8* cursor = (uint8 *)data->map_tex.data;
+	for (int i = 0; i < data->map_tex.height; i++)
 	{
-		if (i % 10 == 0) y -= .1f;
-		x += 0.1f;
+		for (int j = 0; j < data->map_tex.width; j++)
+		{
+			uint8 r, g, b = 0;
+			r = *cursor++;
+			g = *(cursor++);
+			b = *(cursor++);
 
-		data->blocks[i].pos = {x, y};
-		data->blocks[i].width = 1.00f;
-		data->blocks[i].height = 1.00f;
-		data->blocks[i].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+			if (r == 0 && g == 0 && b == 0)
+			{
+				data->blocks[count].pos = {(f32)j, (f32)i};
+				data->blocks[count].width = 1.00f;
+				data->blocks[count].height = 1.00f;
+				data->blocks[count].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+				count++;
+			}
+		}
 	}
-
-	data->Camera_Pos = { 0.3f, 0.0f };
+	data->block_count = count;
+	data->Camera_Pos = { 0.0f, 0.0f };
 }
 
 static rect GetEntityRect(Entity ent)
@@ -363,13 +373,6 @@ static void update_sprite(Gameplay_Data * data,
 	}
 }
 
-static void SpawnPlayer(Gameplay_Data *data)
-{
-	data->Character.pos = data->starting_pos;
-	data->Character.velocity.x = 0.0f;
-	data->Character.velocity.y = 0.0f;    	
-}
-
 #define DRAG_FACTOR 4.0f
 #define TANK_SPEED 5.0f
 
@@ -386,16 +389,17 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 	//TODO(shutton) : maybe put this somewhere else? Are we clearing memory when the .dll is reloaded? Maybe move memory stuff to the platform layer?
     if(!data->IsInitialized)
     {		
-		read_file_result MusicFile = Platform.ReadEntireFile("../assets/music.wav");
-		data->MusicSound = load_wav_from_memory(MusicFile.data);
+		//read_file_result MusicFile = Platform.ReadEntireFile("../assets/music.wav");
+		//data->MusicSound = load_wav_from_memory(MusicFile.data);
 
 		data->character_texture = Platform.LoadTexture("../assets/tank_base.png");
 		data->turret_texture = Platform.LoadTexture("../assets/tank_turret.png");
 		data->block_texture = Platform.LoadTexture("../assets/block.png");
+		data->map_tex = Platform.LoadTextureData("../assets/map.bmp");
+		
 		InitGameObjecets(memory);
 
 		//AddPlaySound(&data->MusicSound, true);
-        SpawnPlayer(data);
 
         data->IsInitialized = true;
     }
@@ -530,7 +534,7 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
 	Platform.AddQuadToRenderBuffer(make_quad(data->Character.pos.x,
 	                                         data->Character.pos.y, 1.0f, 1.0f,
 	                                         data->turret_rotation), data->turret_texture.handle);
-	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
+	for (int i = 0; i < data->block_count; i++)
 	{
 		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->blocks[i]), data->block_texture.handle);
 	}

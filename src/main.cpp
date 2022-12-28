@@ -188,6 +188,13 @@ static Texture load_image_with_stbi(char * file_name)
 	return tex;
 }
 
+static texture_data get_texture_data(char * file_name)
+{
+	texture_data result;
+	result.data = (void *)stbi_load(file_name, &result.width, &result.height, &result.channels, 0);
+	return result;
+}
+
 static Texture Get_Texture(char * path)
 {
 	char * base_path = win32State_.ExeFilePath;
@@ -282,6 +289,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 
 	Platform.ReadEntireFile = win32_read_file;
 	Platform.LoadTexture = Get_Texture;
+	Platform.LoadTextureData = get_texture_data;
 	Platform.AddQuadToRenderBuffer = add_quad_to_render_buffer;
 	Platform.SetCameraPos = SetCameraPosition;
     

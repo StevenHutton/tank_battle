@@ -32,7 +32,7 @@ typedef int32 bool32;
 #define Gigabytes(Value) (Megabytes(Value)*1024LL)
 #define Terabytes(Value) (Gigabytes(Value)*1024LL)
 
-#define QUAD_BUFFER_SIZE 256
+#define QUAD_BUFFER_SIZE 1024
 #define QUAD_BUFFER_MAX 256
 
 inline uint32
@@ -72,6 +72,11 @@ typedef struct Quad {
 	Vertex verts[4];
 } Quad;
 
+typedef struct texture_data {
+	int width, height, channels;
+	void * data;
+} texture_data;
+
 typedef struct Texture {
 	int width, height;
 	uint32 handle;
@@ -85,6 +90,7 @@ struct read_file_result
 
 typedef read_file_result read_entire_file(char *filename);
 typedef Texture load_texture(char *filename);
+typedef texture_data load_texture_data(char * file_name);
 
 typedef struct button_state
 {
@@ -101,6 +107,7 @@ typedef struct
 	set_camera_position * SetCameraPos;
 	read_entire_file *ReadEntireFile;    
 	load_texture *LoadTexture;
+	load_texture_data *LoadTextureData;
 	bool32 QuitRequested;
 } platform_api;
 

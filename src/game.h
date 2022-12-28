@@ -23,13 +23,14 @@ typedef struct Entity {
 	Sprite sprite;
 } Entity;
 
-#define NUM_BLOCKS_MAP 1
+#define NUM_BLOCKS_MAP 1000
 
 typedef struct Gameplay_Data {
 	bool32 IsInitialized;
 	Entity Character = {};
 	f32 turret_rotation = {};
 	Entity blocks[NUM_BLOCKS_MAP];
+	int block_count;
 	Vector2 Camera_Pos = {};
 	Vector2 starting_pos;
 	Loaded_Sound MusicSound;
@@ -38,6 +39,7 @@ typedef struct Gameplay_Data {
 	Texture turret_texture;
 	Texture block_texture;
 	Sprite block_sprite;
+	texture_data map_tex;
 } Gameplay_Data;
 
 #define GAME_h
