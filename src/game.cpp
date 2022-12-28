@@ -66,7 +66,7 @@ static void InitGameObjecets(Game_Memory * memory)
 	data->Character.height = 1.0f;
 	data->Character.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->Character.sprite = data->character_sprite;
-	data->Character.pos = {15.f, 15.f};
+	data->Character.pos = {5.f, 14.f};
 	
 	int count = 0;
 	uint8* cursor = (uint8 *)data->map_tex.data;
@@ -90,7 +90,7 @@ static void InitGameObjecets(Game_Memory * memory)
 		}
 	}
 	data->block_count = count;
-	data->Camera_Pos = { 0.0f, 0.0f };
+	data->Camera_Pos = { 24.0f, 14.5f };
 }
 
 static rect GetEntityRect(Entity ent)
@@ -275,16 +275,6 @@ static bool Is_Penetration_Naive(Entity e1, Entity e2)
 	return false;
 }
 
-static void update_camera(Gameplay_Data * data, f32 dt, bool button_up_pressed, bool button_down_pressed)
-{
-	Vector2 old_camera_pos;
-	old_camera_pos.x = data->Camera_Pos.x;
-	old_camera_pos.y = data->Camera_Pos.y;
-    
-	data->Camera_Pos.x = data->Character.pos.x;
-	data->Camera_Pos.y = data->Character.pos.y;
-}
-
 static Quad make_quad(f32 pos_x, f32 pos_y, f32 width, f32 height, float rotation = 0.f, Color color = {1.0f, 1.0f, 1.0f, 1.0f},
 	bool flip_x = false)
 {
@@ -374,7 +364,7 @@ static void update_sprite(Gameplay_Data * data,
 }
 
 #define DRAG_FACTOR 4.0f
-#define TANK_SPEED 5.0f
+#define TANK_SPEED 10.0f
 
 extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, Input_State *Input, f32 dt)
 {    
@@ -522,7 +512,6 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 		}
 	}    
 	update_sprite(data, &data->Character.sprite, dt);
-    update_camera(data, dt, Input->MoveUp.ended_down, Input->MoveDown.ended_down);
 }
 
 extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
