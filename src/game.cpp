@@ -65,6 +65,13 @@ static void InitGameObjecets(Game_Memory * memory)
 	data->Tank.height = 1.0f;
 	data->Tank.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->Tank.pos = {5.f, 14.f};
+
+	for (int i = 0; i < NUM_BULLETS; i++)
+	{
+		data->bullets[i].width = 0.55f;
+		data->bullets[i].height = 0.55f;
+		data->bullets[i].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	}
 	
 	int count = 0;
 	uint8* cursor = (uint8 *)data->map_tex.data;
@@ -263,7 +270,7 @@ static void resolve_swept_collisions_with_terrain(Entity * ent, Collision cols[]
 
 static bool Is_Penetration_Naive(Entity e1, Entity e2)
 {
-	rect r1 = GetEntityRect(e1);
+	rect r1 = GetExpandedRect(e1, e2.width /2.f, e2.height/2.f);
     
 	if(e2.pos.x > r1.left && e2.pos.x < r1.right && 
 		e2.pos.y > r1.bottom && e2.pos.y < r1.top)
@@ -485,6 +492,37 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 			break;
 		}
 	}
+
+	if (WasPressed(Input->ActionDown))
+	{
+		//fire bullet
+		for (int i = 0; i < NUM_BULLETS; i++)
+		{
+			if (data->bullets[i].is_active) continue;
+
+			data->bullets[i].is_active = true;
+			data->bullets[i].pos = data->Tank.pos;
+			Vector2 up = { 0.f, 1.f };
+			Vector2 bearing = Rotate(up, data->Tank.rotation + data->turret_rotation);
+			data->bullets[i].velocity = (bearing * 10.0f);
+			data->bullets[i].velocity += data->Tank.velocity;
+			break;
+		}
+	}
+
+	for (int i = 0; i < NUM_BULLETS; i++)
+	{
+		if (!data->bullets[i].is_active) continue;
+		for (int j = 0; j < data->block_count; j++)
+		{
+			if (Is_Penetration_Naive(data->bullets[i], data->blocks[j]))
+			{
+				data->bullets[i].is_active = false;
+			}
+		}
+
+		data->bullets[i].pos += (data->bullets[i].velocity * dt);		
+	}
 }
 
 extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
@@ -500,5 +538,12 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
 	{
 		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->blocks[i]), data->block_texture.handle);
 	}
+
+	for (int i = 0; i < NUM_BULLETS; i++)
+	{
+		if (!data->bullets[i].is_active) continue;
+		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->bullets[i]), data->bullet_texture.handle);
+	}
+
 	Platform.SetCameraPos(data->Camera_Pos);
 }

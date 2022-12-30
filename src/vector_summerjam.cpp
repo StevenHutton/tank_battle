@@ -10,12 +10,11 @@ Vector2 operator+( Vector2 const& lhs, Vector2 const& rhs )
 	return result;
 }
 
-Vector2 operator+=(Vector2 const& lhs, Vector2 const& rhs )
+Vector2& operator+=(Vector2 & lhs, Vector2 const& rhs )
 {
-	Vector2 result;
-	result.x = lhs.x + rhs.x;
-	result.y = lhs.y + rhs.y;
-	return result;
+	lhs.x = lhs.x + rhs.x;
+	lhs.y = lhs.y + rhs.y;
+	return lhs;
 }
 
 Vector2 operator-( Vector2 const& lhs, Vector2 const& rhs )
@@ -34,7 +33,7 @@ Vector2 operator*( Vector2 const& lhs, Vector2 const& rhs )
 	return result;
 }
 
-Vector2 operator*( Vector2 const& lhs, float rhs )
+Vector2 operator*( Vector2 const& lhs, float const& rhs )
 {
 	Vector2 result;
 	result.x = lhs.x * rhs;
@@ -42,7 +41,7 @@ Vector2 operator*( Vector2 const& lhs, float rhs )
 	return result;
 }
 
-Vector2 operator*( float const& lhs, Vector2 rhs )
+Vector2 operator*( float const& lhs, Vector2 const& rhs )
 {
 	Vector2 result;
 	result.x = lhs * rhs.x;
