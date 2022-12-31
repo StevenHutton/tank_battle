@@ -370,7 +370,6 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 		data->bullet_texture = Platform.LoadTexture("../assets/bullet.png");
 		
 		InitGameObjecets(memory);
-
 		//AddPlaySound(&data->MusicSound, true);
 
         data->IsInitialized = true;
