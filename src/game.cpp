@@ -38,25 +38,6 @@ typedef struct Penetration
 #define PLAYER_DRAG 3.0f
 #define MAX_VELOCITY 0.8f
 
-static Sprite create_sprite(Texture tex, uint8 frame_count, f32 size_x, f32 size_y, 
-                            f32 offset_x = 0.0f, f32 offset_y = 0.0f)
-{
-	Sprite sprite = {};
-
-	sprite.tex = tex;
-	sprite.frame_count = frame_count;
-	sprite.current_frame = 0;
-	sprite.frame_width = (uint8)sprite.tex.width / sprite.frame_count;
-	sprite.frame_height = sprite.frame_width;
-	sprite.frame_duration = 1.f/6.f;
-	sprite.size.x = size_x;
-	sprite.size.y = size_y;
-	sprite.offset.x = offset_x;
-	sprite.offset.y = offset_y;
-
-	return sprite;
-}
-
 static void InitGameObjecets(Game_Memory * memory)
 {
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
@@ -317,31 +298,6 @@ static Quad make_quad_from_entity(Entity entity)
 	                 entity.width, entity.height, entity.rotation, entity.color);
 }
 
-static void update_sprite(Gameplay_Data * data, 
-                          Sprite * sprite, 
-                          f32 delta_time_s,
-                          bool should_repeat = true)
-{
-	sprite->frame_time += delta_time_s;
-    
-	if (sprite->frame_time > sprite->frame_duration)
-	{
-		sprite->frame_time -= sprite->frame_duration;
-		sprite->current_frame += 1;
-		if (sprite->current_frame >= sprite->frame_count)
-		{
-			if(should_repeat)
-			{
-				sprite->current_frame = 0;
-			}
-			else
-			{
-				sprite->current_frame = sprite->frame_count-1;
-			}            
-		}
-	}
-}
-
 #define DRAG_FACTOR 4.0f
 #define TANK_SPEED 10.0f
 #define TANK_ROTATION_SPEED 0.015f;
@@ -363,7 +319,7 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 		//read_file_result MusicFile = Platform.ReadEntireFile("../assets/music.wav");
 		//data->MusicSound = load_wav_from_memory(MusicFile.data);
 
-		data->character_texture = Platform.LoadTexture("../assets/tank_base.png");
+		data->tank_texture = Platform.LoadTexture("../assets/tank_base.png");
 		data->turret_texture = Platform.LoadTexture("../assets/tank_turret.png");
 		data->block_texture = Platform.LoadTexture("../assets/block.png");
 		data->map_tex = Platform.LoadTextureData("../assets/map.bmp");
@@ -529,7 +485,7 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
 	platform_api Platform = *PlatformAPI;
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
     
-	Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Tank), data->character_texture.handle);
+	Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Tank), data->tank_texture.handle);
 	Platform.AddQuadToRenderBuffer(make_quad(data->Tank.pos.x,
 	                                         data->Tank.pos.y, 1.0f, 1.0f,
 	                                         data->turret_rotation + data->Tank.rotation), data->turret_texture.handle);
