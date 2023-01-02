@@ -22,6 +22,7 @@ typedef struct Gameplay_Data {
 	Entity Tank = {};
 	Entity Tank2 = {};
 	f32 turret_rotation = {};
+	f32 turret_rotation2 = {};
 	Entity blocks[NUM_BLOCKS_MAP];
 	Entity bullets[NUM_BULLETS];
 	int block_count;
