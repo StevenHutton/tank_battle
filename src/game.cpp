@@ -27,11 +27,14 @@ static void InitGameObjecets(Game_Memory * memory)
 	data->Tank.height = 1.0f;
 	data->Tank.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->Tank.pos = {5.f, 14.f};
+	data->Tank.health = 100;
 		
 	data->Tank2.width = 1.0f;
 	data->Tank2.height = 1.0f;
 	data->Tank2.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->Tank2.pos = {45.f, 14.f};
+	data->Tank2.health = 100;
+	data->Tank2.is_active = true;
 
 	for (int i = 0; i < NUM_BULLETS; i++)
 	{
@@ -57,6 +60,8 @@ static void InitGameObjecets(Game_Memory * memory)
 				data->blocks[count].width = 1.00f;
 				data->blocks[count].height = 1.00f;
 				data->blocks[count].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+				data->blocks[count].is_active = true;
+				data->blocks[count].health = 200;
 				count++;
 			}
 		}
@@ -270,14 +275,25 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 		if (!data->bullets[i].is_active) continue;
 		for (int j = 0; j < data->block_count; j++)
 		{
-			if (Is_Penetration_Naive(data->bullets[i], data->blocks[j]))
+			if (Is_Penetration_Naive(data->bullets[i], data->blocks[j]) && data->blocks[j].is_active)
 			{
 				data->bullets[i].is_active = false;
+				data->blocks[j].health -= 10;
+				if(data->blocks[j].health <= 0)
+					data->blocks[j].is_active = false;
+			}
+			if (Is_Penetration_Naive(data->bullets[i], data->Tank2) && data->Tank2.is_active)
+			{
+				data->bullets[i].is_active = false;
+				data->Tank2.health -= 10;
 			}
 		}
 
 		data->bullets[i].pos += (data->bullets[i].velocity * dt);		
 	}
+
+	if(data->Tank2.health <= 0)
+		data->Tank2.is_active = false;
 }
 
 extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
@@ -288,12 +304,15 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
 	Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Tank), data->tank_texture.handle);
 	Platform.AddQuadToRenderBuffer(make_quad(data->Tank.pos.x, data->Tank.pos.y, 1.0f, 1.0f,
 	                                         data->turret_rotation + data->Tank.rotation), data->turret_texture.handle);
-	
-	Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Tank2), data->tank_texture.handle);
-	Platform.AddQuadToRenderBuffer(make_quad(data->Tank2.pos.x, data->Tank2.pos.y, 1.0f, 1.0f,
-	                                         data->turret_rotation2 + data->Tank2.rotation), data->turret_texture.handle);
+	if (data->Tank2.is_active)
+	{
+		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Tank2), data->tank_texture.handle);
+		Platform.AddQuadToRenderBuffer(make_quad(data->Tank2.pos.x, data->Tank2.pos.y, 1.0f, 1.0f,
+		                                         data->turret_rotation2 + data->Tank2.rotation), data->turret_texture.handle);
+	}
 	for (int i = 0; i < data->block_count; i++)
 	{
+		if (!data->blocks[i].is_active) continue;
 		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->blocks[i]), data->block_texture.handle);
 	}
 

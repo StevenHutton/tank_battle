@@ -11,7 +11,8 @@ typedef struct Entity {
 	f32 width;
 	f32 height;
 	Color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	bool is_active = false;
+	bool is_active = true;
+	int health = 100;
 } Entity;
 
 #define NUM_BLOCKS_MAP 1000

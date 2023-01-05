@@ -10,6 +10,11 @@ if not defined DevEnvDir (
 )
 
 
+if not defined DevEnvDir (
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+)
+
+
 IF NOT EXIST bin mkdir bin
 pushd bin
 
