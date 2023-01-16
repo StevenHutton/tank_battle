@@ -52,7 +52,11 @@ static rect GetExpandedRect(Entity ent, f32 halfWidth, f32 halfHeight, f32 modif
 
 static bool Is_Penetration(Entity e1, Entity e2, Penetration& pen)
 {
-	f32 offset_x = e1.pos.x - e2.pos.x;
+    if (!e2.is_active) {
+        return false;
+    }
+
+    f32 offset_x = e1.pos.x - e2.pos.x;
 	f32 offset_y = e1.pos.y - e2.pos.y;
     
 	f32 offset_mag_x = abs(offset_x);
@@ -106,7 +110,11 @@ static int get_worst_pen_index(Penetration pens[], int pen_count)
 
 static bool Is_Collision(Entity e1, Entity e2, Collision& col, f32 dt)
 {
-	rect r = GetExpandedRect(e2, e1.width/2, e1.height/2, -0.01f);
+    if (!e2.is_active) {
+        return false;
+    }
+
+    rect r = GetExpandedRect(e2, e1.width/2, e1.height/2, -0.01f);
 	
 	//check for obvious misses
 	if(e1.velocity.x == 0.0f &&
