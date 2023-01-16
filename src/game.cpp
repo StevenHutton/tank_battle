@@ -19,6 +19,8 @@ static bool32 WasPressed(button_state State)
 #define PLAYER_DRAG 3.0f
 #define MAX_VELOCITY 0.8f
 
+Entity screen_space;
+
 static void InitGameObjecets(Game_Memory * memory)
 {
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
@@ -68,6 +70,10 @@ static void InitGameObjecets(Game_Memory * memory)
 	}
 	data->block_count = count;
 	data->Camera_Pos = { 24.0f, 14.5f };
+
+	screen_space.pos = { 24.0f, 14.5f };
+	screen_space.width = 55.0f;
+	screen_space.height = 35.0f;
 }
 
 static Quad make_quad(f32 pos_x, f32 pos_y, f32 width, f32 height, float rotation = 0.f, Color color = {1.0f, 1.0f, 1.0f, 1.0f},
@@ -287,6 +293,9 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 				data->bullets[i].is_active = false;
 				data->Tank2.health -= 10;
 			}
+
+			if (!Is_Penetration_Naive(data->bullets[i], screen_space))
+				data->bullets[i].is_active = false;
 		}
 
 		data->bullets[i].pos += (data->bullets[i].velocity * dt);		

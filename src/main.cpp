@@ -378,7 +378,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
         if(Platform.QuitRequested)
         {
             break;
-        }        
+        }
         
         f32 FrameSeconds = Win32GetSecondsElapsed(LastPerformanceCounter, Win32GetWallClock());
         
@@ -390,8 +390,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                 Sleep(Miliseconds);
             }
             
-            FrameSeconds = Win32GetSecondsElapsed(LastPerformanceCounter, Win32GetWallClock());
-            
+            FrameSeconds = Win32GetSecondsElapsed(LastPerformanceCounter, Win32GetWallClock());            
             while(FrameSeconds < TargetSeconds)
             {
                 FrameSeconds = Win32GetSecondsElapsed(LastPerformanceCounter, Win32GetWallClock());
