@@ -7,10 +7,11 @@
 #include "includes/stb_image.h"
 #include "summerjam.h"
 #include "audio.h"
+#include "game.h"
 
 static platform_api Platform;
 
-typedef void Update_Gameplay(platform_api *PlatformAPI, Game_Memory *memory, struct Input_State *Input, f32 dt);
+typedef void Update_Gameplay(platform_api *PlatformAPI, Game_Memory *memory, struct Input_State Input, struct Input_State Input2, f32 dt);
 typedef void Update_GameAudio(game_sound_buffer *SoundBuffer, f32 DeltaTime);
 typedef void Render_Gameplay(platform_api *PlatformAPI, Game_Memory *memory);
 
@@ -21,7 +22,9 @@ typedef struct Win32_State
     char ExeFilePath[MAX_PATH];
     char DllFullFilePath[MAX_PATH];
     char TempDllFullFilePath[MAX_PATH];
-    char LockFullFilePath[MAX_PATH];
+	char LockFullFilePath[MAX_PATH];
+	char BotDll1FilePath[MAX_PATH];
+	char BotDll2FilePath[MAX_PATH];
     FILETIME LastDLLWriteTime;
     HMODULE AppLibrary;
     Update_Gameplay *UpdateGamePlay;
@@ -341,12 +344,28 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	XINPUT_STATE XInputState = {};
 	XINPUT_STATE Old_XInputState = {};
 	Input_State input_state = {};
+	Input_State input_state2 = {};
     
     // NOTE: Otherwise Sleep will be ignored for requests less than 50? citation needed
     UINT MinSleepPeriod = 1;
     timeBeginPeriod(MinSleepPeriod);
     f32 TargetSeconds = 1.0f / 60.0f;
-    
+
+	HMODULE player1 = LoadLibraryA(win32State->BotDll1FilePath);
+	HMODULE player2 = LoadLibraryA(win32State->BotDll2FilePath);
+
+	if (player1)
+	{
+		Gameplay_Data * data = (Gameplay_Data *)memory.persistent_memory;
+		data->update_player1_func = (Update_Bot *)GetProcAddress(player1, "UpdateBot");
+	}
+
+	if (player2)
+	{
+		Gameplay_Data * data = (Gameplay_Data *)memory.persistent_memory;
+		data->update_player2_func = (Update_Bot *)GetProcAddress(player2, "UpdateBot");
+	}
+	    
     while(GlobalRunning)
 	{
 		Gameplay_dll_reload(win32State);
@@ -363,10 +382,20 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		{
 			get_gamepad_input(XInputState, Old_XInputState, input_state);
 		}
+		Gameplay_Data * data = (Gameplay_Data *)memory.persistent_memory;
+		if (data->update_player1_func)
+		{
+			input_state = data->update_player1_func(*data, 1);
+		}
+		
+		if (data->update_player2_func)
+		{
+			input_state2 = data->update_player2_func(*data, 2);
+		}
 
         if(win32State->UpdateGamePlay && win32State->RenderGameplay)
         {
-			win32State->UpdateGamePlay(&Platform, &memory, &input_state, TargetSeconds);
+			win32State->UpdateGamePlay(&Platform, &memory, input_state, input_state2, TargetSeconds);
 			win32State->RenderGameplay(&Platform, &memory);
         }
         

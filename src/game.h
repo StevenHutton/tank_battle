@@ -4,15 +4,20 @@
 #include "summerjam.h"
 #include "audio.h"
 
+struct Gameplay_Data;
+
+typedef Input_State Update_Bot(Gameplay_Data data, int player_number);
+
 typedef struct Entity {
 	Vector2 pos;
 	Vector2 velocity;
-	float rotation;	
+	f32 rotation;	
 	f32 width;
 	f32 height;
 	Color color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	bool is_active = true;
 	int health = 100;
+	f32 t_rot;
 } Entity;
 
 #define NUM_BLOCKS_MAP 1000
@@ -22,8 +27,6 @@ typedef struct Gameplay_Data {
 	bool32 IsInitialized;
 	Entity Tank = {};
 	Entity Tank2 = {};
-	f32 turret_rotation = {};
-	f32 turret_rotation2 = {};
 	Entity blocks[NUM_BLOCKS_MAP];
 	Entity bullets[NUM_BULLETS];
 	int block_count;
@@ -35,7 +38,10 @@ typedef struct Gameplay_Data {
 	Texture block_texture;
 	Texture bullet_texture;
 	texture_data map_tex;
+	Update_Bot * update_player1_func;
+	Update_Bot * update_player2_func;
 } Gameplay_Data;
+
 
 #define GAME_h
 #endif //GAME_H

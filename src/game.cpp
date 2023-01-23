@@ -118,9 +118,149 @@ static Quad make_quad_from_entity(Entity entity)
 #define TANK_ROTATION_SPEED 0.015f;
 #define TURRET_ROTATION_SPEED 0.03f;
 
-extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, Input_State *Input, f32 dt)
+void update_player(Gameplay_Data * data, Entity * player, Input_State Input, f32 dt)
+{
+	Vector2 acceleration = {};
+	
+	if (Input.MoveLeft.ended_down)
+	{
+		player->rotation -= TANK_ROTATION_SPEED;
+	}
+	else if (Input.MoveRight.ended_down)
+	{
+		player->rotation += TANK_ROTATION_SPEED;
+	}
+
+	if (Input.ActionLeft.ended_down)
+	{
+		player->t_rot -= TURRET_ROTATION_SPEED;
+	}
+	else if (Input.ActionRight.ended_down)
+	{
+		player->t_rot += TURRET_ROTATION_SPEED;
+	}
+
+	Vector2 north = { 0.f, 1.f };
+	Vector2 forward = Rotate(north, player->rotation);
+
+	if (Input.MoveDown.ended_down)
+	{
+		acceleration = -TANK_SPEED * forward;
+	}
+	else if (Input.MoveUp.ended_down)
+	{
+		acceleration = TANK_SPEED * forward;
+	}
+	else acceleration = { 0.0f, 0.f };
+    
+	f32 dragX = -DRAG_FACTOR * player->velocity.x;
+	acceleration.x += dragX;
+
+	f32 dragY = -DRAG_FACTOR * player->velocity.y;
+	acceleration.y += dragY;
+	
+	player->velocity.x += acceleration.x * dt;
+	player->velocity.y += acceleration.y * dt;
+		
+	if (WasPressed(Input.ActionDown))
+	{
+		//fire bullet
+		for (int i = 0; i < NUM_BULLETS; i++)
+		{
+			if (data->bullets[i].is_active) continue;
+
+			data->bullets[i].is_active = true;
+			data->bullets[i].pos = player->pos;
+			Vector2 up = { 0.f, 1.f };
+			Vector2 bearing = Rotate(up, player->rotation + player->t_rot);
+			data->bullets[i].pos += bearing * 0.8f;
+			data->bullets[i].velocity = (bearing * 10.0f);
+			data->bullets[i].velocity += player->velocity;
+			break;
+		}
+	}
+		    
+	//sweapt phase collision detection - adjust velocity to prevent collision
+	Collision collision = {};
+	Collision cols[NUM_BLOCKS_MAP];
+	int num_cols = 0;
+	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
+	{
+		if (Is_Collision(*player, data->blocks[i], collision, dt))
+		{
+			cols[num_cols] = collision;
+			num_cols++;
+		}
+	}
+	resolve_swept_collisions_with_terrain(player, cols, num_cols);
+		       
+	//update character position	
+	player->pos.x += player->velocity.x * dt;
+	player->pos.y += player->velocity.y * dt;
+
+	//penetration phase collision detection
+	Penetration pen;
+	Penetration pens[20];
+	int num_pens = 0;
+	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
+	{
+		if (Is_Penetration(*player, data->blocks[i], pen))
+		{
+			pens[num_pens] = pen;
+			num_pens++;
+		}
+	}
+
+	int worst_pen_index = get_worst_pen_index(pens, num_pens);
+	int loop_count = 0;
+	while (worst_pen_index != -1)
+	{
+		pen = pens[worst_pen_index];		
+		player->pos = player->pos + (pen.depth * pen.normal);
+		if (pen.normal.x == 1)
+		{
+			player->velocity.x = maxf(player->velocity.x, 0.0f);
+		}
+		else if (pen.normal.x == -1)
+		{
+			player->velocity.x = minf(player->velocity.x, 0.0f);
+		}
+		
+		if (pen.normal.y == 1)
+		{
+			player->velocity.y = maxf(player->velocity.y, 0.0f);
+		}
+		else if (pen.normal.y == -1)
+		{
+			player->velocity.y = minf(player->velocity.y, 0.0f);
+		}
+        
+		num_pens = 0;
+		for (uint32 i = 0; i < NUM_BLOCKS_MAP; i++)
+		{
+			if (Is_Penetration(*player, data->blocks[i], pen))
+			{
+				pens[num_pens] = pen;
+				num_pens++;
+			}
+		}
+		worst_pen_index = get_worst_pen_index(pens, num_pens);
+		loop_count++;
+        
+		if (loop_count >= 100)
+		{
+			player->pos.y += 0.1f;            
+			break;
+		}
+	}
+
+	if(player->health <= 0)
+		player->is_active = false;
+}
+
+extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, Input_State Input, Input_State Input2, f32 dt)
 {    
-    if(WasPressed(Input->Back))
+    if(WasPressed(Input.Back))
     {
         PlatformAPI->QuitRequested = true;
     }
@@ -141,141 +281,10 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
         data->IsInitialized = true;
     }
 
-	Vector2 acceleration = {};
-	Entity * player = &data->Tank;
-	
-	if (Input->MoveLeft.ended_down)
-	{
-		player->rotation -= TANK_ROTATION_SPEED;
-	}
-	else if (Input->MoveRight.ended_down)
-	{
-		player->rotation += TANK_ROTATION_SPEED;
-	}
+	update_player(data, &data->Tank, Input, dt);
+	update_player(data, &data->Tank2, Input2, dt);
 
-	if (Input->ActionLeft.ended_down)
-	{
-		data->turret_rotation -= TURRET_ROTATION_SPEED;
-	}
-	else if (Input->ActionRight.ended_down)
-	{
-		data->turret_rotation += TURRET_ROTATION_SPEED;
-	}
-
-	Vector2 north = { 0.f, 1.f };
-	Vector2 forward = Rotate(north, player->rotation);
-
-	if (Input->MoveDown.ended_down)
-	{
-		acceleration = -TANK_SPEED * forward;
-	}
-	else if (Input->MoveUp.ended_down)
-	{
-		acceleration = TANK_SPEED * forward;
-	}
-	else acceleration = { 0.0f, 0.f };
-    
-	f32 dragX = -DRAG_FACTOR * data->Tank.velocity.x;
-	acceleration.x += dragX;
-
-	f32 dragY = -DRAG_FACTOR * data->Tank.velocity.y;
-	acceleration.y += dragY;
-	
-	data->Tank.velocity.x += acceleration.x * dt;
-	data->Tank.velocity.y += acceleration.y * dt;
-    
-	//sweapt phase collision detection - adjust velocity to prevent collision
-	Collision collision = {};
-	Collision cols[NUM_BLOCKS_MAP];
-	int num_cols = 0;
-	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
-	{
-		if (Is_Collision(data->Tank, data->blocks[i], collision, dt))
-		{
-			cols[num_cols] = collision;
-			num_cols++;
-		}
-	}
-	resolve_swept_collisions_with_terrain(&data->Tank, cols, num_cols);
-		       
-	//update character position	
-	data->Tank.pos.x += data->Tank.velocity.x * dt;
-	data->Tank.pos.y += data->Tank.velocity.y * dt;
-
-	//penetration phase collision detection
-	Penetration pen;
-	Penetration pens[20];
-	int num_pens = 0;
-	for (int i = 0; i < NUM_BLOCKS_MAP; i++)
-	{
-		if (Is_Penetration(data->Tank, data->blocks[i], pen))
-		{
-			pens[num_pens] = pen;
-			num_pens++;
-		}
-	}
-
-	int worst_pen_index = get_worst_pen_index(pens, num_pens);
-	int loop_count = 0;
-	while (worst_pen_index != -1)
-	{
-		pen = pens[worst_pen_index];		
-		data->Tank.pos = data->Tank.pos + (pen.depth * pen.normal);
-		if (pen.normal.x == 1)
-		{
-			data->Tank.velocity.x = maxf(data->Tank.velocity.x, 0.0f);
-		}
-		else if (pen.normal.x == -1)
-		{
-			data->Tank.velocity.x = minf(data->Tank.velocity.x, 0.0f);
-		}
-		
-		if (pen.normal.y == 1)
-		{
-			data->Tank.velocity.y = maxf(data->Tank.velocity.y, 0.0f);
-		}
-		else if (pen.normal.y == -1)
-		{
-			data->Tank.velocity.y = minf(data->Tank.velocity.y, 0.0f);
-		}
-        
-		num_pens = 0;
-		for (uint32 i = 0; i < NUM_BLOCKS_MAP; i++)
-		{
-			if (Is_Penetration(data->Tank, data->blocks[i], pen))
-			{
-				pens[num_pens] = pen;
-				num_pens++;
-			}
-		}
-		worst_pen_index = get_worst_pen_index(pens, num_pens);
-		loop_count++;
-        
-		if (loop_count >= 100)
-		{
-			data->Tank.pos.y += 0.1f;            
-			break;
-		}
-	}
-
-	if (WasPressed(Input->ActionDown))
-	{
-		//fire bullet
-		for (int i = 0; i < NUM_BULLETS; i++)
-		{
-			if (data->bullets[i].is_active) continue;
-
-			data->bullets[i].is_active = true;
-			data->bullets[i].pos = data->Tank.pos;
-			Vector2 up = { 0.f, 1.f };
-			Vector2 bearing = Rotate(up, data->Tank.rotation + data->turret_rotation);
-			data->bullets[i].pos += bearing * 0.8f;
-			data->bullets[i].velocity = (bearing * 10.0f);
-			data->bullets[i].velocity += data->Tank.velocity;
-			break;
-		}
-	}
-
+	//update bullets
 	for (int i = 0; i < NUM_BULLETS; i++)
 	{
 		if (!data->bullets[i].is_active) continue;
@@ -300,9 +309,6 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 
 		data->bullets[i].pos += (data->bullets[i].velocity * dt);		
 	}
-
-	if(data->Tank2.health <= 0)
-		data->Tank2.is_active = false;
 }
 
 extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
@@ -312,12 +318,12 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
     
 	Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Tank), data->tank_texture.handle);
 	Platform.AddQuadToRenderBuffer(make_quad(data->Tank.pos.x, data->Tank.pos.y, 1.0f, 1.0f,
-	                                         data->turret_rotation + data->Tank.rotation), data->turret_texture.handle);
+	                                         data->Tank.t_rot + data->Tank.rotation), data->turret_texture.handle);
 	if (data->Tank2.is_active)
 	{
 		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Tank2), data->tank_texture.handle);
 		Platform.AddQuadToRenderBuffer(make_quad(data->Tank2.pos.x, data->Tank2.pos.y, 1.0f, 1.0f,
-		                                         data->turret_rotation2 + data->Tank2.rotation), data->turret_texture.handle);
+		                                         data->Tank2.t_rot + data->Tank2.rotation), data->turret_texture.handle);
 	}
 	for (int i = 0; i < data->block_count; i++)
 	{

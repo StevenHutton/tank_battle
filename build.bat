@@ -9,11 +9,9 @@ if not defined DevEnvDir (
 	call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
 )
 
-
 if not defined DevEnvDir (
 	call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
 )
-
 
 IF NOT EXIST bin mkdir bin
 pushd bin
@@ -23,8 +21,10 @@ cl -Od -W4 -wd4505 -wd4100 -wd4201 -nologo /DSLOW /DINTERNAL -FC -Zi ..\src\main
 del game_*.pdb > NUL 2> NUL
 
 echo WAITING FOR PDB > lock.tmp
-cl -Od -W4 -wd4505 -wd4100 -wd4201 -nologo /DSLOW /DINTERNAL -FC -Zi ..\src\game.cpp -LD /link  -incremental:no -opt:ref -PDB:game_%random%.pdb -EXPORT:UpdateGamePlay -EXPORT:UpdateGameAudio -EXPORT:RenderGameplay
+cl -Od -W4 -wd4505 -wd4100 -wd4201 -nologo /DSLOW /DINTERNAL -FC -Zi ..\src\game.cpp -LD /link -incremental:no -opt:ref -PDB:game_%random%.pdb -EXPORT:UpdateGamePlay -EXPORT:UpdateGameAudio -EXPORT:RenderGameplay
 del lock.tmp
+
+cl -Od -W4 -wd4505 -wd4100 -wd4201 -nologo /DSLOW /DINTERNAL -FC -Zi ..\src\bot.cpp -LD /link -incremental:no -opt:ref -PDB:bot.pdb -EXPORT:UpdateBot /OUT:player2.dll
 
 del /q *.exp
 del /q *.lib

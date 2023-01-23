@@ -222,4 +222,10 @@ Win32GetFilePaths(Win32_State *win32State)
     
 	Copy(Length, win32State->ExeFilePath, win32State->LockFullFilePath);
 	AppendCString(win32State->LockFullFilePath + Length, "\\lock.tmp");
+		
+	Copy(Length, win32State->ExeFilePath, win32State->BotDll1FilePath);
+	AppendCString(win32State->BotDll1FilePath + Length, "\\player1.dll");
+
+	Copy(Length, win32State->ExeFilePath, win32State->BotDll2FilePath);
+	AppendCString(win32State->BotDll2FilePath + Length, "\\player2.dll");
 }
