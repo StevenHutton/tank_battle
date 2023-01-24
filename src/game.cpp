@@ -120,9 +120,11 @@ static Quad make_quad_from_entity(Entity entity)
 #define TURRET_ROTATION_SPEED 0.03f;
 
 void update_player(Gameplay_Data * data, Entity * player, Input_State Input, f32 dt)
-{
-	Vector2 acceleration = {};
+{	
+	if (!player->is_active) return;
 	
+	Vector2 acceleration = {};
+		
 	if (Input.MoveLeft.ended_down)
 	{
 		player->rotation -= TANK_ROTATION_SPEED;
@@ -174,7 +176,7 @@ void update_player(Gameplay_Data * data, Entity * player, Input_State Input, f32
 			data->bullets[i].pos = player->pos;
 			Vector2 up = { 0.f, 1.f };
 			Vector2 bearing = Rotate(up, player->rotation + player->t_rot);
-			data->bullets[i].pos += bearing * 1.2f;
+			data->bullets[i].pos += bearing * 1.1f;
 			data->bullets[i].velocity = (bearing * 15.0f);
 			data->bullets[i].velocity += player->velocity;
 			break;
