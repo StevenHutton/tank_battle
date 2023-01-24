@@ -18,7 +18,7 @@ bool is_in_block(Gameplay_Data * data, Vector2 point)
 {
 	for (int i = 0; i < data->block_count; i++)
 	{
-		if (is_point_collision(data->blocks[i], point)) return true;
+		if (data->blocks[i].is_active && is_point_collision(data->blocks[i], point)) return true;
 	}
 	return false;
 }
