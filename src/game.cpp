@@ -148,6 +148,9 @@ void update_player(Gameplay_Data * data, Tank * tank, Input_State Input, f32 dt)
 	{
 		player->t_rot += TURRET_ROTATION_SPEED;
 	}
+	
+	if (player.t_rot >= 360.0f) player->t_rot -= 360.0f;
+	if (player.t_rot < 0.0f) player->t_rot += 360.0f;
 
 	Vector2 north = { 0.f, 1.f };
 	Vector2 forward = Rotate(north, player->rotation);

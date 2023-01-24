@@ -14,6 +14,16 @@ void set_button(button_state &button, bool isPressed = true)
 	}
 }
 
+f32 get_bearing(const Vector2 vec)
+{
+	f32 bearing = atan2f(vec.y, vec.x);
+
+	bearing = bearing * 180.0f / (f32)M_PI;
+	bearing -= 90.0f;
+
+	return bearing;
+}
+
 extern "C" Input_State UpdateBot(Gameplay_Data data, int player_number)
 {
 	Input_State input_state = {};

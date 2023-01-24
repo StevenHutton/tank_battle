@@ -6,6 +6,8 @@
 #include <math.h>
 #include "vector_summerjam.cpp"
 
+# define M_PI           3.14159265358979323846  /* pi */
+
 struct Gameplay_Data;
 
 typedef Input_State Update_Bot(Gameplay_Data data, int player_number);
