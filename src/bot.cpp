@@ -14,9 +14,9 @@ void set_button(button_state &button, bool isPressed = true)
 	}
 }
 
-f32 get_bearing(const Vector2 from, const Vector2 too)
+f32 get_bearing(const Vector2 from, const Vector2 to)
 {
-	Vector2 dir = from - too;
+	Vector2 dir = from - to;
 	//atan2 expects y-axis to be down not up or vice versa. Which ever way it is it's the other way to this game.
 	f32 bearing = atan2f(-dir.y, dir.x);
 	bearing -= 90.0f * ((f32)M_PI / 180.0f); //in Atan2 0 is in the direction of the positive X-axis. In this game 0 degrees is positive Y-axis.
