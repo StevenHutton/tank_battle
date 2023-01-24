@@ -139,6 +139,9 @@ void update_player(Gameplay_Data * data, Tank * tank, Input_State Input, f32 dt)
 	{
 		player->rotation += TANK_ROTATION_SPEED;
 	}
+		
+	if (player->rotation >= 360.0f) player->rotation -= 360.0f;
+	if (player->rotation < 0.0f) player->rotation += 360.0f;
 
 	if (Input.ActionLeft.ended_down)
 	{
