@@ -31,13 +31,15 @@ static void InitGameObjecets(Game_Memory * memory)
 	data->player1.ent.pos = {5.f, 14.f};
 	data->player1.ent.health = 100;
 	data->player1.ent.is_active = true;
+	data->player1.fire_timer = 0.0f;
 		
 	data->player2.ent.width = 1.0f;
 	data->player2.ent.height = 1.0f;
 	data->player2.ent.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	data->player2.ent.pos = {45.f, 14.f};
 	data->player2.ent.health = 100;
-	data->player2.ent.is_active = true;
+	data->player2.ent.is_active = true; 
+	data->player2.fire_timer = 0.0f;
 
 	for (int i = 0; i < NUM_BULLETS; i++)
 	{
@@ -116,13 +118,18 @@ static Quad make_quad_from_entity(Entity entity)
 
 #define DRAG_FACTOR 4.0f
 #define TANK_SPEED 10.0f
-#define TANK_ROTATION_SPEED 0.015f;
-#define TURRET_ROTATION_SPEED 0.03f;
+#define TANK_ROTATION_SPEED 0.015f
+#define TURRET_ROTATION_SPEED 0.03f
+#define FIRE_COOLDOWN 0.5f
 
-void update_player(Gameplay_Data * data, Entity * player, Input_State Input, f32 dt)
+void update_player(Gameplay_Data * data, Tank * tank, Input_State Input, f32 dt)
 {	
-	if (!player->is_active) return;
-	
+	if (!tank->ent.is_active) return;
+
+	if (tank->fire_timer >= 0.0f)
+		tank->fire_timer -= dt;
+
+	Entity * player = &tank->ent;	
 	Vector2 acceleration = {};
 		
 	if (Input.MoveLeft.ended_down)
@@ -165,7 +172,7 @@ void update_player(Gameplay_Data * data, Entity * player, Input_State Input, f32
 	player->velocity.x += acceleration.x * dt;
 	player->velocity.y += acceleration.y * dt;
 		
-	if (WasPressed(Input.ActionDown))
+	if (WasPressed(Input.ActionDown) && tank->fire_timer <= 0.0f)
 	{
 		//fire bullet
 		for (int i = 0; i < NUM_BULLETS; i++)
@@ -181,6 +188,8 @@ void update_player(Gameplay_Data * data, Entity * player, Input_State Input, f32
 			data->bullets[i].velocity += player->velocity;
 			break;
 		}
+
+		tank->fire_timer += FIRE_COOLDOWN;
 	}
 		    
 	//sweapt phase collision detection - adjust velocity to prevent collision
@@ -284,8 +293,8 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
         data->IsInitialized = true;
     }
 
-	update_player(data, &data->player1.ent, Input, dt);
-	update_player(data, &data->player2.ent, Input2, dt);
+	update_player(data, &data->player1, Input, dt);
+	update_player(data, &data->player2, Input2, dt);
 
 	//update bullets
 	for (int i = 0; i < NUM_BULLETS; i++)
