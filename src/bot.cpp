@@ -21,6 +21,7 @@ extern "C" Input_State UpdateBot(Gameplay_Data data, int player_number)
 	input_state.MoveUp.ended_down = true;
 	input_state.MoveUp.HalfTransitionCount = 1;
 
+	input_state.MoveLeft.ended_down = true;
 	
 	input_state.ActionLeft.ended_down = true;
 	input_state.ActionLeft.HalfTransitionCount = 1;
