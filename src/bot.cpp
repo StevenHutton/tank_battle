@@ -1,6 +1,18 @@
 #include "game.h"
 
-
+void set_button(button_state &button, bool isPressed = true)
+{
+	if (isPressed)
+	{
+		button.ended_down = true;
+		button.HalfTransitionCount = 1;
+	}
+	else
+	{
+		button.ended_down = false;
+		button.HalfTransitionCount = 0;
+	}
+}
 
 extern "C" Input_State UpdateBot(Gameplay_Data data, int player_number)
 {
@@ -17,14 +29,6 @@ extern "C" Input_State UpdateBot(Gameplay_Data data, int player_number)
 		player = &data.Tank2;
 		enemy = &data.Tank;
 	}
-
-	input_state.MoveUp.ended_down = true;
-	input_state.MoveUp.HalfTransitionCount = 1;
-
-	input_state.MoveLeft.ended_down = true;
-	
-	input_state.ActionLeft.ended_down = true;
-	input_state.ActionLeft.HalfTransitionCount = 1;
 
 	return input_state;
 }
