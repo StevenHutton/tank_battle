@@ -5,6 +5,7 @@
 #include "audio.h"
 #include <math.h>
 #include "vector_summerjam.cpp"
+#include "useful_summerjam.cpp"
 
 # define M_PI           3.14159265358979323846  /* pi */
 
@@ -51,6 +52,7 @@ typedef struct Gameplay_Data {
 	Update_Bot * update_player2_func;
 } Gameplay_Data;
 
+#include "collision.cpp"
 
 #define GAME_h
 #endif //GAME_H
