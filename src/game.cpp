@@ -25,18 +25,19 @@ static void InitGameObjecets(Game_Memory * memory)
 {
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
 
-	data->Tank.width = 1.0f;
-	data->Tank.height = 1.0f;
-	data->Tank.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	data->Tank.pos = {5.f, 14.f};
-	data->Tank.health = 100;
+	data->player1.ent.width = 1.0f;
+	data->player1.ent.height = 1.0f;
+	data->player1.ent.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	data->player1.ent.pos = {5.f, 14.f};
+	data->player1.ent.health = 100;
+	data->player1.ent.is_active = true;
 		
-	data->Tank2.width = 1.0f;
-	data->Tank2.height = 1.0f;
-	data->Tank2.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	data->Tank2.pos = {45.f, 14.f};
-	data->Tank2.health = 100;
-	data->Tank2.is_active = true;
+	data->player2.ent.width = 1.0f;
+	data->player2.ent.height = 1.0f;
+	data->player2.ent.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	data->player2.ent.pos = {45.f, 14.f};
+	data->player2.ent.health = 100;
+	data->player2.ent.is_active = true;
 
 	for (int i = 0; i < NUM_BULLETS; i++)
 	{
@@ -173,8 +174,8 @@ void update_player(Gameplay_Data * data, Entity * player, Input_State Input, f32
 			data->bullets[i].pos = player->pos;
 			Vector2 up = { 0.f, 1.f };
 			Vector2 bearing = Rotate(up, player->rotation + player->t_rot);
-			data->bullets[i].pos += bearing * 0.8f;
-			data->bullets[i].velocity = (bearing * 10.0f);
+			data->bullets[i].pos += bearing * 1.2f;
+			data->bullets[i].velocity = (bearing * 15.0f);
 			data->bullets[i].velocity += player->velocity;
 			break;
 		}
@@ -281,8 +282,8 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
         data->IsInitialized = true;
     }
 
-	update_player(data, &data->Tank, Input, dt);
-	update_player(data, &data->Tank2, Input2, dt);
+	update_player(data, &data->player1.ent, Input, dt);
+	update_player(data, &data->player2.ent, Input2, dt);
 
 	//update bullets
 	for (int i = 0; i < NUM_BULLETS; i++)
@@ -297,10 +298,17 @@ extern "C" void UpdateGamePlay(platform_api *PlatformAPI, Game_Memory *memory, I
 				if(data->blocks[j].health <= 0)
 					data->blocks[j].is_active = false;
 			}
-			if (Is_Penetration_Naive(data->bullets[i], data->Tank2) && data->Tank2.is_active)
+			
+			if (Is_Penetration_Naive(data->bullets[i], data->player1.ent) && data->player1.ent.is_active)
 			{
 				data->bullets[i].is_active = false;
-				data->Tank2.health -= 10;
+				data->player1.ent.health -= 10;
+			}
+
+			if (Is_Penetration_Naive(data->bullets[i], data->player2.ent) && data->player2.ent.is_active)
+			{
+				data->bullets[i].is_active = false;
+				data->player2.ent.health -= 10;
 			}
 
 			if (!Is_Penetration_Naive(data->bullets[i], screen_space))
@@ -315,15 +323,18 @@ extern "C" void RenderGameplay(platform_api *PlatformAPI, Game_Memory *memory)
 {
 	platform_api Platform = *PlatformAPI;
 	Gameplay_Data * data = (Gameplay_Data *)memory->persistent_memory;
-    
-	Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Tank), data->tank_texture.handle);
-	Platform.AddQuadToRenderBuffer(make_quad(data->Tank.pos.x, data->Tank.pos.y, 1.0f, 1.0f,
-	                                         data->Tank.t_rot + data->Tank.rotation), data->turret_texture.handle);
-	if (data->Tank2.is_active)
+	
+	if (data->player1.ent.is_active)
 	{
-		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->Tank2), data->tank_texture.handle);
-		Platform.AddQuadToRenderBuffer(make_quad(data->Tank2.pos.x, data->Tank2.pos.y, 1.0f, 1.0f,
-		                                         data->Tank2.t_rot + data->Tank2.rotation), data->turret_texture.handle);
+		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->player1.ent), data->tank_texture.handle);
+		Platform.AddQuadToRenderBuffer(make_quad(data->player1.ent.pos.x, data->player1.ent.pos.y, 1.0f, 1.0f,
+		                                         data->player1.ent.t_rot + data->player1.ent.rotation), data->turret_texture.handle);
+	}
+	if (data->player2.ent.is_active)
+	{
+		Platform.AddQuadToRenderBuffer(make_quad_from_entity(data->player2.ent), data->tank_texture.handle);
+		Platform.AddQuadToRenderBuffer(make_quad(data->player2.ent.pos.x, data->player2.ent.pos.y, 1.0f, 1.0f,
+		                                         data->player2.ent.t_rot + data->player2.ent.rotation), data->turret_texture.handle);
 	}
 	for (int i = 0; i < data->block_count; i++)
 	{

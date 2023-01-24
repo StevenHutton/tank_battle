@@ -17,17 +17,17 @@ void set_button(button_state &button, bool isPressed = true)
 extern "C" Input_State UpdateBot(Gameplay_Data data, int player_number)
 {
 	Input_State input_state = {};
-	Entity * player;
-	Entity * enemy;
+	Tank * player;
+	Tank * enemy;
 	if (player_number == 1)
 	{
-		player = &data.Tank;
-		enemy = &data.Tank2;
+		player = &data.player1;
+		enemy = &data.player2;
 	}
 	else
 	{
-		player = &data.Tank2;
-		enemy = &data.Tank;
+		player = &data.player2;
+		enemy = &data.player1;
 	}
 
 	return input_state;

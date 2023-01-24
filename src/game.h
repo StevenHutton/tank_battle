@@ -20,13 +20,18 @@ typedef struct Entity {
 	f32 t_rot;
 } Entity;
 
+typedef struct Tank {
+	Entity ent;
+	float fire_timer;
+} Tank;
+
 #define NUM_BLOCKS_MAP 1000
 #define NUM_BULLETS 50
 
 typedef struct Gameplay_Data {
 	bool32 IsInitialized;
-	Entity Tank = {};
-	Entity Tank2 = {};
+	Tank player1 = {};
+	Tank player2 = {};
 	Entity blocks[NUM_BLOCKS_MAP];
 	Entity bullets[NUM_BULLETS];
 	int block_count;
