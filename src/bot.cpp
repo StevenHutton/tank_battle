@@ -14,6 +14,15 @@ void set_button(button_state &button, bool isPressed = true)
 	}
 }
 
+bool is_in_block(Gameplay_Data * data, Vector2 point)
+{
+	for (int i = 0; i < data->block_count; i++)
+	{
+		if (is_point_collision(data->blocks[i], point)) return true;
+	}
+	return false;
+}
+
 f32 get_bearing(const Vector2 from, const Vector2 to)
 {
 	Vector2 dir = from - to;

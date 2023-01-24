@@ -211,5 +211,17 @@ static bool Is_Penetration_Naive(Entity e1, Entity e2)
 	return false;
 }
 
+bool is_point_collision(Entity ent, Vector2 pos)
+{
+	rect r1 = GetEntityRect(ent);
+
+	if(pos.x > r1.left && pos.x < r1.right && 
+		pos.y > r1.bottom && pos.y < r1.top)
+	{
+		return true;
+	}
+	return false;
+}
+
 #define COLISION_CPP
 #endif
