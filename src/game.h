@@ -3,6 +3,8 @@
 
 #include "summerjam.h"
 #include "audio.h"
+#include <math.h>
+#include "vector_summerjam.cpp"
 
 struct Gameplay_Data;
 

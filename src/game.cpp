@@ -3,7 +3,6 @@
 #include "audio.h"
 #include "game.h"
 #include "useful_summerjam.cpp"
-#include "vector_summerjam.cpp"
 #include "matrix_summer.cpp"
 #include "audio.cpp"
 #include "collision.cpp"
